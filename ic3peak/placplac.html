@@ -483,7 +483,12 @@ input[type=range].stem-vol::-webkit-slider-thumb {
   width: 8px;
   height: 8px;
   border-radius: 50%;
+  background: var(--thumb-color, var(--text-dim));
   cursor: pointer;
+  transition: filter .15s;
+}
+input[type=range].stem-vol:hover::-webkit-slider-thumb {
+  filter: brightness(1.4);
 }
 
 /* stem toggle button */
@@ -660,7 +665,7 @@ function stemChildren(stems, parentClass) {
 
     // vol slider
     const volSlider = row.querySelector(`#sv-${stem.id}`);
-    volSlider.style.setProperty('accent-color', stem.color);
+    volSlider.style.setProperty('--thumb-color', stem.color);
     volSlider.addEventListener('input', e => {
       stemVol[stem.id] = parseFloat(e.target.value);
       applyVolume(stem.id);
@@ -1028,7 +1033,22 @@ document.getElementById('masterVol').addEventListener('input', e => {
 // ─────────────────────────────────────────────────────
 //  PLAY BUTTON
 // ─────────────────────────────────────────────────────
-document.getElementById('playBtn').addEventListener('click', togglePlay);
+(function() {
+  const btn = document.getElementById('playBtn');
+  let lastTouch = 0;
+  btn.addEventListener('touchend', e => {
+    e.preventDefault();            // блокирует синтетический click после touch
+    const now = Date.now();
+    if (now - lastTouch < 300) return;  // защита от двойного тапа
+    lastTouch = now;
+    togglePlay();
+  }, { passive: false });
+  btn.addEventListener('click', e => {
+    // на мобиле уже отработал touchend, пропускаем
+    if (Date.now() - lastTouch < 300) return;
+    togglePlay();
+  });
+})();
 
 // ─────────────────────────────────────────────────────
 //  KEYBOARD SHORTCUTS
