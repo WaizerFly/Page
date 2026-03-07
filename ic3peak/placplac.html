@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kollages - Плак-плак v2</title>
+<title>Kollages - Плак-плак v3</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Azeret+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&display=swap" rel="stylesheet">
 <style>
@@ -618,7 +618,7 @@ collectStems(TREE);
 // ─────────────────────────────────────────────────────
 const stemOn   = {};  // stemId → bool
 const stemVol  = {};  // stemId → 0..1
-ALL_STEMS.forEach(s => { stemOn[s.id] = true; stemVol[s.id] = 1; });
+ALL_STEMS.forEach(s => { stemOn[s.id] = true; stemVol[s.id] = 0.5; });
 
 // Audio (plain HTMLAudioElement, no Web Audio API – works on file://)
 const audioEls  = {};      // stemId → HTMLAudioElement
@@ -654,7 +654,7 @@ function stemChildren(stems, parentClass) {
         <img src="${stem.spec}" alt="" onerror="this.parentElement.classList.add('no-img');this.remove()">
         <div class="playhead" id="ph-${stem.id}"></div>
       </div>
-      <input type="range" class="stem-vol" min="0" max="1" step="0.01" value="1"
+      <input type="range" class="stem-vol" min="0" max="1" step="0.01" value="0.5"
              style="--webkit-slider-runnable-track-color:${stem.color}"
              id="sv-${stem.id}">
       <button class="stem-toggle" data-on="true" data-stem="${stem.id}"
