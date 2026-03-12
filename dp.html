@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Донаты</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0 }
+    body { font-family: sans-serif; background: #0f0f0f; color: #eee; padding: 24px }
+    h1 { margin-bottom: 20px; font-size: 22px; color: #fff }
+    #list { display: flex; flex-direction: column; gap: 10px }
+    .item {
+      background: #1c1c1c;
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .left { display: flex; flex-direction: column; gap: 4px }
+    .name { font-weight: 600; font-size: 15px }
+    .msg { color: #aaa; font-size: 13px }
+    .date { color: #555; font-size: 12px }
+    .amount { font-size: 18px; font-weight: 700; color: #4caf50; white-space: nowrap }
+    #status { color: #666; font-size: 14px }
+  </style>
+</head>
+<body>
+  <h1>Донаты</h1>
+  <p id="status">Загрузка...</p>
+  <div id="list"></div>
+
+  <script>
+    const WORKER_URL = "https://cry.waizerfly.com/api/getdonates"
+
+    async function load() {
+      try {
+        const res = await fetch(WORKER_URL)
+        const data = await res.json()
+        const list = document.getElementById("list")
+        const status = document.getElementById("status")
+
+        if (!data.length) {
+          status.textContent = "Донатов пока нет"
+          return
+        }
+
+        status.textContent = `Показано: ${data.length} донатов`
+        list.innerHTML = data.map(d => `
+          <div class="item">
+            <div class="left">
+              <span class="name">${d.what || "Аноним"}</span>
+              ${d.comment ? `<span class="msg">${d.comment}</span>` : ""}
+              <span class="date">${new Date(d.created_at).toLocaleString("ru-RU")}</span>
+            </div>
+            <span class="amount">${d.sum} ₽</span>
+          </div>
+        `).join("")
+      } catch(e) {
+        document.getElementById("status").textContent = "Ошибка загрузки: " + e.message
+      }
+    }
+
+    load()
+    setInterval(load, 60000)
+  </script>
+</body>
+</html>
