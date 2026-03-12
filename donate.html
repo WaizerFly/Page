@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Магазин</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;500;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    background: #0a0a0f;
+    color: #e0e0e0;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background:
+      radial-gradient(ellipse at 30% 40%, rgba(0, 200, 100, 0.1) 0%, transparent 50%),
+      radial-gradient(ellipse at 70% 60%, rgba(120, 0, 255, 0.1) 0%, transparent 50%);
+    z-index: -1;
+  }
+
+  .container {
+    max-width: 520px;
+    width: 100%;
+    padding: 20px;
+  }
+
+  .card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(120, 0, 255, 0.2);
+    border-radius: 20px;
+    padding: 40px 35px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 60px rgba(120, 0, 255, 0.05);
+    animation: fadeUp 0.6s ease;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-header {
+    text-align: center;
+    margin-bottom: 35px;
+  }
+
+  .card-header .icon {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+  }
+
+  .card-header h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #00e676, #7b00ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 1px;
+  }
+
+  .card-header .server {
+    color: rgba(255,255,255,0.35);
+    font-size: 0.8rem;
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 3px;
+    margin-top: 6px;
+  }
+
+  label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+    margin-top: 20px;
+  }
+
+  input, select {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    outline: none;
+    transition: all 0.3s ease;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  input::placeholder { color: rgba(255,255,255,0.25); }
+
+  input:focus, select:focus {
+    border-color: rgba(120, 0, 255, 0.5);
+    box-shadow: 0 0 20px rgba(120, 0, 255, 0.1);
+    background: rgba(255, 255, 255, 0.07);
+  }
+
+  select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='rgba(255,255,255,0.4)' viewBox='0 0 16 16'%3E%3Cpath d='M8 12L2 6h12z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+  }
+
+  select option {
+    background: #1a1a2e;
+    color: #e0e0e0;
+  }
+
+  .buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 30px;
+  }
+
+  button {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  button::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    transition: left 0.5s ease;
+  }
+
+  button:hover::after { left: 100%; }
+
+  .btn-crypto {
+    background: linear-gradient(135deg, #f7931a, #ff6600);
+    color: #fff;
+  }
+  .btn-crypto:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(247, 147, 26, 0.3); }
+
+  .btn-card {
+    background: linear-gradient(135deg, #7b00ff, #5500cc);
+    color: #fff;
+  }
+  .btn-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(123, 0, 255, 0.3); }
+
+  .btn-sbp {
+    background: linear-gradient(135deg, #00c853, #009624);
+    color: #fff;
+  }
+  .btn-sbp:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 200, 83, 0.3); }
+
+  /* Upsell */
+  .upsell {
+    margin-top: 30px;
+    padding: 16px 20px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    text-align: center;
+  }
+
+  .upsell .label {
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.3);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+
+  .upsell a {
+    color: #a066ff;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+  }
+
+  .upsell a:hover { color: #c8a0ff; text-shadow: 0 0 10px rgba(160, 102, 255, 0.4); }
+
+  /* Back link */
+  .back {
+    display: block;
+    text-align: center;
+    margin-top: 25px;
+    color: rgba(255,255,255,0.35);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: color 0.3s;
+  }
+
+  .back:hover { color: rgba(255,255,255,0.7); }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <div class="icon">&#9878;</div>
+      <h1>Донат на сервере</h1>
+      <div class="server">mc.WarNight.net</div>
+    </div>
+
+    <label>Никнейм</label>
+    <input id="nick" placeholder="Введите ник..." autocomplete="off">
+
+    <label>Ранг</label>
+    <select id="rank">
+      <option value="1 1">VIP — 1 &#8381;</option>
+      <option value="2 10">Lord — 10 &#8381;</option>
+      <option value="3 100">Lord+ — 100 &#8381;</option>
+      <option value="4 1199">Владелец — 1 199 &#8381;</option>
+      <option value="5 1499">WarNight — 1 499 &#8381;</option>
+    </select>
+
+    <div class="buttons">
+      <button class="btn-crypto" onclick="pay('crypto')">&#8383; Оплатить криптой</button>
+      <button class="btn-card" onclick="pay('card')">&#128179; Оплатить картой</button>
+      <button class="btn-sbp" onclick="pay('sbp')">&#9889; Оплатить через СБП</button>
+    </div>
+
+    <div class="upsell">
+      <div class="label">Вам также может понравиться</div>
+      <a href="megahackkey.html">Mega Hack v9 ключ — 799 &#8381;</a>
+    </div>
+  </div>
+
+  <a href="javascript:history.back()" class="back">&#8592; Назад</a>
+</div>
+
+<script>
+async function pay(method) {
+  const n = nick.value.trim();
+  if (!n) return alert("Введите ник");
+  const [id, price] = rank.value.split(" ");
+  location = await (await fetch("/api/pay", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ amount: +price, desc: id + " " + n, method })
+  })).text();
+}
+</script>
+</body>
+</html>
