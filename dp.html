@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Донаты</title>
+  <title>Транзакции</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0 }
     body { font-family: sans-serif; background: #0f0f0f; color: #eee; padding: 24px }
@@ -28,7 +28,7 @@
   </style>
 </head>
 <body>
-  <h1>Донаты</h1>
+  <h1>Транзакции</h1>
   <p id="status">Загрузка...</p>
   <div id="list"></div>
 
@@ -43,11 +43,11 @@
         const status = document.getElementById("status")
 
         if (!data.length) {
-          status.textContent = "Донатов пока нет"
+          status.textContent = "Транзакций пока нет"
           return
         }
 
-        status.textContent = `Показано: ${data.length} донатов`
+        status.textContent = `Показано: ${data.length} транзакций`
         list.innerHTML = data.map(d => `
           <div class="item">
             <div class="left">
