@@ -5,15 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Магазин</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;500;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@400;500;600;700&display=swap');
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
     min-height: 100vh;
-    background: #0a0a0f;
-    color: #e0e0e0;
-    font-family: 'Inter', sans-serif;
+    background: #f4f2ee;
+    color: #1a1a1a;
+    font-family: 'Lato', sans-serif;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -26,8 +26,8 @@
     top: 0; left: 0;
     width: 100%; height: 100%;
     background:
-      radial-gradient(ellipse at 30% 40%, rgba(0, 200, 100, 0.1) 0%, transparent 50%),
-      radial-gradient(ellipse at 70% 60%, rgba(120, 0, 255, 0.1) 0%, transparent 50%);
+      radial-gradient(ellipse at 20% 30%, rgba(100, 160, 255, 0.08) 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 70%, rgba(160, 100, 255, 0.06) 0%, transparent 55%);
     z-index: -1;
   }
 
@@ -38,114 +38,118 @@
   }
 
   .card {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(120, 0, 255, 0.2);
+    background: #ffffff;
+    border: 1px solid #e0dcd5;
     border-radius: 20px;
-    padding: 40px 35px;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 0 60px rgba(120, 0, 255, 0.05);
-    animation: fadeUp 0.6s ease;
+    padding: 42px 38px;
+    box-shadow:
+      0 2px 8px rgba(0,0,0,0.06),
+      0 12px 40px rgba(0,0,0,0.08);
+    animation: fadeUp 0.5s ease;
   }
 
   @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 
   .card-header {
     text-align: center;
-    margin-bottom: 35px;
+    margin-bottom: 36px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid #ede9e3;
   }
 
   .card-header .icon {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
     margin-bottom: 12px;
+    display: block;
+    filter: grayscale(0.2);
   }
 
   .card-header h1 {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1.3rem;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.45rem;
     font-weight: 700;
-    background: linear-gradient(135deg, #00e676, #7b00ff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    letter-spacing: 1px;
+    color: #1a1a1a;
+    letter-spacing: 0.5px;
   }
 
   .card-header .server {
-    color: rgba(255,255,255,0.35);
-    font-size: 0.8rem;
-    font-family: 'Orbitron', sans-serif;
-    letter-spacing: 3px;
+    color: #999;
+    font-size: 0.72rem;
+    font-family: 'Lato', sans-serif;
+    letter-spacing: 3.5px;
+    text-transform: uppercase;
     margin-top: 6px;
+    font-weight: 600;
   }
 
   label {
     display: block;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: rgba(255,255,255,0.4);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #888;
     text-transform: uppercase;
-    letter-spacing: 1.5px;
-    margin-bottom: 8px;
+    letter-spacing: 1.8px;
+    margin-bottom: 7px;
     margin-top: 20px;
   }
 
   input, select {
     width: 100%;
-    padding: 14px 16px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    color: #fff;
-    font-family: 'Inter', sans-serif;
+    padding: 13px 15px;
+    background: #faf9f7;
+    border: 1.5px solid #e0dcd5;
+    border-radius: 11px;
+    color: #1a1a1a;
+    font-family: 'Lato', sans-serif;
     font-size: 0.95rem;
     outline: none;
-    transition: all 0.3s ease;
+    transition: all 0.25s ease;
     appearance: none;
     -webkit-appearance: none;
   }
 
-  input::placeholder { color: rgba(255,255,255,0.25); }
+  input::placeholder { color: #bbb; }
 
   input:focus, select:focus {
-    border-color: rgba(120, 0, 255, 0.5);
-    box-shadow: 0 0 20px rgba(120, 0, 255, 0.1);
-    background: rgba(255, 255, 255, 0.07);
+    border-color: #7b5ea7;
+    box-shadow: 0 0 0 3px rgba(123, 94, 167, 0.1);
+    background: #fff;
   }
 
   select {
     cursor: pointer;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='rgba(255,255,255,0.4)' viewBox='0 0 16 16'%3E%3Cpath d='M8 12L2 6h12z'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23999' viewBox='0 0 16 16'%3E%3Cpath d='M8 12L2 6h12z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 16px center;
     padding-right: 40px;
   }
 
   select option {
-    background: #1a1a2e;
-    color: #e0e0e0;
+    background: #fff;
+    color: #1a1a1a;
   }
 
-  /* Consent checkbox */
+  /* Consent */
   .consent {
     display: flex;
     align-items: flex-start;
     gap: 12px;
     margin-top: 24px;
     padding: 14px 16px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    border-radius: 12px;
+    background: #faf9f7;
+    border: 1.5px solid #e0dcd5;
+    border-radius: 11px;
     cursor: pointer;
-    transition: border-color 0.3s, background 0.3s;
+    transition: border-color 0.25s, background 0.25s;
     user-select: none;
   }
 
   .consent:hover {
-    border-color: rgba(120, 0, 255, 0.3);
-    background: rgba(120, 0, 255, 0.04);
+    border-color: #c0aee0;
+    background: #f7f4fd;
   }
 
   .consent input[type="checkbox"] {
@@ -154,20 +158,20 @@
     width: 20px;
     min-width: 20px;
     height: 20px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1.5px solid rgba(255, 255, 255, 0.2);
+    background: #fff;
+    border: 1.5px solid #ccc;
     border-radius: 6px;
     cursor: pointer;
     padding: 0;
     margin-top: 1px;
-    transition: all 0.25s ease;
+    transition: all 0.2s ease;
     position: relative;
   }
 
   .consent input[type="checkbox"]:checked {
-    background: linear-gradient(135deg, #7b00ff, #5500cc);
-    border-color: #7b00ff;
-    box-shadow: 0 0 12px rgba(123, 0, 255, 0.4);
+    background: #7b5ea7;
+    border-color: #7b5ea7;
+    box-shadow: 0 0 0 3px rgba(123, 94, 167, 0.15);
   }
 
   .consent input[type="checkbox"]:checked::after {
@@ -182,9 +186,9 @@
   }
 
   .consent-text {
-    font-size: 0.82rem;
-    color: rgba(255, 255, 255, 0.45);
-    line-height: 1.5;
+    font-size: 0.83rem;
+    color: #777;
+    line-height: 1.55;
     margin: 0;
     text-transform: none;
     letter-spacing: 0;
@@ -192,14 +196,17 @@
   }
 
   .consent-text a {
-    color: #a066ff;
+    color: #7b5ea7;
     text-decoration: none;
-    transition: color 0.2s;
+    border-bottom: 1px solid rgba(123,94,167,0.3);
+    transition: color 0.2s, border-color 0.2s;
   }
 
-  .consent-text a:hover { color: #c8a0ff; }
+  .consent-text a:hover {
+    color: #5a3d80;
+    border-color: #5a3d80;
+  }
 
-  /* Shake animation for validation */
   @keyframes shake {
     0%, 100% { transform: translateX(0); }
     20%, 60% { transform: translateX(-5px); }
@@ -208,8 +215,8 @@
 
   .consent.shake {
     animation: shake 0.4s ease;
-    border-color: rgba(255, 80, 80, 0.5);
-    background: rgba(255, 80, 80, 0.05);
+    border-color: rgba(220, 60, 60, 0.5);
+    background: rgba(220, 60, 60, 0.04);
   }
 
   .buttons {
@@ -221,16 +228,17 @@
 
   button {
     width: 100%;
-    padding: 15px;
+    padding: 14px;
     border: none;
-    border-radius: 12px;
-    font-family: 'Inter', sans-serif;
+    border-radius: 11px;
+    font-family: 'Lato', sans-serif;
     font-size: 0.9rem;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.25s ease;
     position: relative;
     overflow: hidden;
+    letter-spacing: 0.3px;
   }
 
   button::after {
@@ -238,8 +246,8 @@
     position: absolute;
     top: 0; left: -100%;
     width: 100%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-    transition: left 0.5s ease;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+    transition: left 0.45s ease;
   }
 
   button:hover::after { left: 100%; }
@@ -254,63 +262,77 @@
   button:disabled::after { display: none; }
 
   .btn-crypto {
-    background: linear-gradient(135deg, #f7931a, #ff6600);
+    background: linear-gradient(135deg, #e8820c, #d45e00);
     color: #fff;
   }
-  .btn-crypto:not(:disabled):hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(247, 147, 26, 0.3); }
+  .btn-crypto:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(212, 94, 0, 0.28);
+  }
 
   .btn-card {
-    background: linear-gradient(135deg, #7b00ff, #5500cc);
+    background: linear-gradient(135deg, #7b5ea7, #5a3d80);
     color: #fff;
   }
-  .btn-card:not(:disabled):hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(123, 0, 255, 0.3); }
+  .btn-card:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(90, 61, 128, 0.28);
+  }
 
   .btn-sbp {
-    background: linear-gradient(135deg, #00c853, #009624);
+    background: linear-gradient(135deg, #2e9e5c, #1e7a44);
     color: #fff;
   }
-  .btn-sbp:not(:disabled):hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 200, 83, 0.3); }
+  .btn-sbp:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(30, 122, 68, 0.28);
+  }
 
   /* Upsell */
   .upsell {
-    margin-top: 30px;
-    padding: 16px 20px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 12px;
+    margin-top: 28px;
+    padding: 15px 20px;
+    background: #faf9f7;
+    border: 1px solid #e0dcd5;
+    border-radius: 11px;
     text-align: center;
   }
 
   .upsell .label {
-    font-size: 0.7rem;
-    color: rgba(255,255,255,0.3);
+    font-size: 0.69rem;
+    color: #aaa;
     text-transform: uppercase;
     letter-spacing: 2px;
-    margin-bottom: 8px;
+    font-weight: 700;
+    margin-bottom: 7px;
   }
 
   .upsell a {
-    color: #a066ff;
+    color: #7b5ea7;
     text-decoration: none;
-    font-weight: 500;
+    font-weight: 600;
     font-size: 0.9rem;
-    transition: all 0.3s ease;
+    border-bottom: 1px solid rgba(123,94,167,0.3);
+    transition: all 0.2s ease;
   }
 
-  .upsell a:hover { color: #c8a0ff; text-shadow: 0 0 10px rgba(160, 102, 255, 0.4); }
+  .upsell a:hover {
+    color: #5a3d80;
+    border-color: #5a3d80;
+  }
 
-  /* Back link */
   .back {
     display: block;
     text-align: center;
-    margin-top: 25px;
-    color: rgba(255,255,255,0.35);
+    margin-top: 22px;
+    color: #bbb;
     text-decoration: none;
     font-size: 0.85rem;
-    transition: color 0.3s;
+    transition: color 0.25s;
+    font-weight: 500;
   }
 
-  .back:hover { color: rgba(255,255,255,0.7); }
+  .back:hover { color: #777; }
 </style>
 </head>
 <body>
@@ -318,7 +340,7 @@
 <div class="container">
   <div class="card">
     <div class="card-header">
-      <div class="icon">&#9878;</div>
+      <span class="icon">⚓</span>
       <h1>Донат на сервере</h1>
       <div class="server">Minecraft</div>
     </div>
@@ -328,11 +350,11 @@
 
     <label>Ранг</label>
     <select id="rank">
-      <option value="1 1">VIP — 1 &#8381;</option>
-      <option value="2 10">Premium — 10 &#8381;</option>
-      <option value="3 100">Creative — 100 &#8381;</option>
-      <option value="4 1199">Друг админа — 1 199 &#8381;</option>
-      <option value="5 1499">Админ — 1 499 &#8381;</option>
+      <option value="1 1">VIP — 1 ₽</option>
+      <option value="2 10">Premium — 10 ₽</option>
+      <option value="3 100">Creative — 100 ₽</option>
+      <option value="4 1199">Друг админа — 1 199 ₽</option>
+      <option value="5 1499">Админ — 1 499 ₽</option>
     </select>
 
     <label for="consent-check" class="consent" id="consent-wrap">
@@ -343,18 +365,18 @@
     </label>
 
     <div class="buttons">
-      <button class="btn-crypto" id="btn-crypto" disabled onclick="pay('crypto')">&#8383; Оплатить криптой</button>
-      <button class="btn-card"   id="btn-card"   disabled onclick="pay('card')">&#128179; Оплатить картой</button>
-      <button class="btn-sbp"    id="btn-sbp"    disabled onclick="pay('sbp')">&#9889; Оплатить через СБП</button>
+      <button class="btn-crypto" id="btn-crypto" disabled onclick="pay('crypto')">₿ Оплатить криптой</button>
+      <button class="btn-card"   id="btn-card"   disabled onclick="pay('card')">💳 Оплатить картой</button>
+      <button class="btn-sbp"    id="btn-sbp"    disabled onclick="pay('sbp')">⚡ Оплатить через СБП</button>
     </div>
 
     <div class="upsell">
       <div class="label">Вам также может понравиться</div>
-      <a href="megahackkey.html">Mega Hack v9 ключ — 799 &#8381;</a>
+      <a href="megahackkey.html">Mega Hack v9 ключ — 799 ₽</a>
     </div>
   </div>
 
-  <a href="javascript:history.back()" class="back">&#8592; Назад</a>
+  <a href="javascript:history.back()" class="back">← Назад</a>
 </div>
 
 <script>
@@ -369,7 +391,7 @@ async function pay(method) {
   if (!document.getElementById('consent-check').checked) {
     const wrap = document.getElementById('consent-wrap');
     wrap.classList.remove('shake');
-    void wrap.offsetWidth; // reflow to restart animation
+    void wrap.offsetWidth;
     wrap.classList.add('shake');
     setTimeout(() => wrap.classList.remove('shake'), 400);
     return;
