@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WarNight • Wiki заработка монет</title>
+<style>
+  :root{
+    --bg:#0e1116; --bg2:#161b22; --card:#1b222c; --card2:#212a36;
+    --line:#2b3543; --text:#e6edf3; --muted:#9aa7b4; --dim:#6e7c8c;
+    --gold:#ffc94d; --gold2:#f5a623; --green:#4caf50; --green2:#2e7d32;
+    --red:#ef5350; --blue:#4aa3ff; --purple:#b478ff; --cyan:#39d0d8;
+    --shadow:0 8px 30px rgba(0,0,0,.45);
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; font-family:"Segoe UI",Roboto,system-ui,Arial,sans-serif;
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(245,166,35,.10), transparent 60%),
+      radial-gradient(900px 500px at -10% 10%, rgba(74,163,255,.08), transparent 55%),
+      var(--bg);
+    color:var(--text); line-height:1.55; padding-bottom:60px;
+  }
+  a{color:var(--gold)}
+  .wrap{max-width:1120px; margin:0 auto; padding:0 18px}
+
+  /* HEADER */
+  header.hero{
+    position:relative; overflow:hidden; text-align:center;
+    padding:46px 18px 34px;
+    background:linear-gradient(180deg,#10243a 0%, #0e1116 100%);
+    border-bottom:1px solid var(--line);
+  }
+  .hero .crumbs{color:var(--muted); font-size:13px; letter-spacing:2px; text-transform:uppercase}
+  .hero h1{margin:8px 0 6px; font-size:clamp(28px,5vw,46px); letter-spacing:.5px}
+  .hero h1 .coin{color:var(--gold); text-shadow:0 0 18px rgba(255,201,77,.4)}
+  .hero p{margin:6px auto 0; max-width:680px; color:var(--muted); font-size:16px}
+  .hero .ip{
+    display:inline-block; margin-top:16px; padding:8px 16px; border-radius:999px;
+    background:rgba(76,175,80,.12); border:1px solid rgba(76,175,80,.4); color:#a5e6a8;
+    font-weight:600; font-size:15px;
+  }
+  .hero .ip b{color:#fff}
+
+  /* sticky controls */
+  .controls{
+    position:sticky; top:0; z-index:50; backdrop-filter:blur(10px);
+    background:rgba(14,17,22,.86); border-bottom:1px solid var(--line);
+    padding:12px 0;
+  }
+  .controls .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+  #search{
+    flex:1; min-width:220px; padding:11px 14px; border-radius:10px;
+    border:1px solid var(--line); background:var(--bg2); color:var(--text); font-size:15px;
+    outline:none; transition:border .2s;
+  }
+  #search:focus{border-color:var(--gold2)}
+  .chips{display:flex; gap:8px; flex-wrap:wrap}
+  .chip{
+    cursor:pointer; user-select:none; padding:8px 13px; border-radius:999px;
+    border:1px solid var(--line); background:var(--card); color:var(--muted);
+    font-size:13.5px; font-weight:600; transition:all .15s; white-space:nowrap;
+  }
+  .chip:hover{color:var(--text); border-color:var(--dim)}
+  .chip.active{background:var(--gold); color:#1a1205; border-color:var(--gold)}
+
+  /* TL;DR loop */
+  .loop{
+    margin:26px 0 8px; padding:20px 22px; border-radius:var(--radius);
+    background:linear-gradient(135deg, rgba(245,166,35,.10), rgba(74,163,255,.06));
+    border:1px solid var(--line); box-shadow:var(--shadow);
+  }
+  .loop h2{margin:0 0 14px; font-size:20px}
+  .loopsteps{display:flex; gap:10px; flex-wrap:wrap; align-items:stretch}
+  .step{
+    flex:1; min-width:150px; background:var(--card); border:1px solid var(--line);
+    border-radius:12px; padding:14px; position:relative;
+  }
+  .step .n{font-size:12px; color:var(--gold); font-weight:700; letter-spacing:1px}
+  .step .t{font-weight:700; margin:4px 0 4px; font-size:15px}
+  .step .d{color:var(--muted); font-size:13.5px}
+  .step .ar{position:absolute; right:-13px; top:50%; transform:translateY(-50%); color:var(--dim); font-size:20px; z-index:2}
+  @media(max-width:720px){ .step .ar{display:none} }
+
+  h2.sec{font-size:24px; margin:38px 0 4px; display:flex; align-items:center; gap:10px}
+  .sec-sub{color:var(--muted); margin:0 0 18px; font-size:14.5px}
+
+  /* comparison table */
+  .tablewrap{overflow-x:auto; border-radius:var(--radius); border:1px solid var(--line); box-shadow:var(--shadow)}
+  table{border-collapse:collapse; width:100%; min-width:560px; background:var(--card); font-size:14.5px}
+  th,td{padding:11px 13px; text-align:left; border-bottom:1px solid var(--line)}
+  thead th{background:var(--bg2); color:var(--muted); font-size:12.5px; text-transform:uppercase; letter-spacing:.6px; position:sticky; top:0}
+  table.sortable thead th{cursor:pointer; user-select:none}
+  table.sortable thead th:hover{color:var(--text)}
+  table.sortable thead th::after{content:" ⇅"; color:var(--dim); font-size:11px}
+  tbody tr:hover{background:var(--card2)}
+  tbody tr:last-child td{border-bottom:none}
+  td .amt{color:var(--gold); font-weight:700; white-space:nowrap}
+  .tag{display:inline-block; padding:2px 9px; border-radius:999px; font-size:11.5px; font-weight:700; letter-spacing:.3px; white-space:nowrap}
+  .t-active{background:rgba(74,163,255,.15); color:#9ccbff; border:1px solid rgba(74,163,255,.35)}
+  .t-passive{background:rgba(76,175,80,.15); color:#a5e6a8; border:1px solid rgba(76,175,80,.35)}
+  .t-risk{background:rgba(239,83,80,.15); color:#ffb3b1; border:1px solid rgba(239,83,80,.35)}
+  .t-game{background:rgba(180,120,255,.15); color:#d6bcff; border:1px solid rgba(180,120,255,.35)}
+  .t-social{background:rgba(57,208,216,.13); color:#a7eef2; border:1px solid rgba(57,208,216,.32)}
+
+  /* method cards */
+  .cards{display:grid; grid-template-columns:1fr; gap:18px; margin-top:8px}
+  .method{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    box-shadow:var(--shadow); overflow:hidden; scroll-margin-top:90px;
+  }
+  .method .head{display:flex; align-items:center; gap:14px; padding:18px 20px; border-bottom:1px solid var(--line); background:linear-gradient(180deg,var(--card2),transparent)}
+  .method .icon{font-size:30px; width:52px; height:52px; display:grid; place-items:center; background:var(--bg2); border-radius:12px; border:1px solid var(--line); flex-shrink:0}
+  .method .htext{flex:1; min-width:0}
+  .method .htext h3{margin:0; font-size:19px; display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+  .method .htext .pay{color:var(--gold); font-weight:800}
+  .method .htext .meta{margin-top:5px; display:flex; gap:6px; flex-wrap:wrap}
+  .method .body{padding:18px 20px}
+  .method .body p{margin:0 0 12px; color:#cdd6df}
+  .method .body p:last-child{margin-bottom:0}
+  .cmd{font-family:"Consolas",monospace; background:#0a0d12; border:1px solid var(--line); color:#ffd98a; padding:2px 7px; border-radius:6px; font-size:13.5px; white-space:nowrap}
+  .note{margin-top:12px; padding:11px 13px; border-left:3px solid var(--gold2); background:rgba(245,166,35,.07); border-radius:0 8px 8px 0; font-size:13.8px; color:#e8d9b6}
+  .warn{border-left-color:var(--red); background:rgba(239,83,80,.08); color:#f2c9c7}
+  .good{border-left-color:var(--green); background:rgba(76,175,80,.08); color:#cfe9d0}
+  ul.clean{margin:6px 0 0; padding-left:20px; color:#cdd6df}
+  ul.clean li{margin:4px 0}
+
+  /* calculator */
+  .calc{display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end; background:var(--bg2); border:1px solid var(--line); border-radius:12px; padding:16px}
+  .calc label{display:block; font-size:12.5px; color:var(--muted); margin-bottom:5px; text-transform:uppercase; letter-spacing:.5px}
+  .calc input{width:160px; padding:10px 12px; border-radius:9px; border:1px solid var(--line); background:var(--card); color:var(--text); font-size:16px; outline:none}
+  .calc input:focus{border-color:var(--gold2)}
+  .calc .out{flex:1; min-width:200px}
+  .calc .big{font-size:26px; font-weight:800; color:var(--gold)}
+  .calc .sub{color:var(--muted); font-size:13.5px}
+
+  details.spend{margin-top:14px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden}
+  details.spend>summary{cursor:pointer; padding:16px 20px; font-weight:700; font-size:17px; list-style:none; display:flex; justify-content:space-between; align-items:center}
+  details.spend>summary::-webkit-details-marker{display:none}
+  details.spend>summary::after{content:"▸"; color:var(--gold); transition:transform .2s}
+  details.spend[open]>summary::after{transform:rotate(90deg)}
+  details.spend .inner{padding:0 20px 18px}
+
+  .empty{display:none; text-align:center; color:var(--muted); padding:40px; font-size:16px}
+
+  footer{margin-top:46px; padding:24px 18px; text-align:center; color:var(--dim); font-size:13px; border-top:1px solid var(--line)}
+  #top{position:fixed; right:18px; bottom:18px; z-index:60; width:46px; height:46px; border-radius:50%;
+    background:var(--gold); color:#1a1205; border:none; font-size:20px; cursor:pointer; box-shadow:var(--shadow);
+    opacity:0; pointer-events:none; transition:opacity .25s; font-weight:800}
+  #top.show{opacity:1; pointer-events:auto}
+  .hl{background:rgba(255,201,77,.28); border-radius:3px}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="crumbs">WarNight • Гайд для игроков</div>
+  <h1>💰 Все способы заработать <span class="coin">монеты</span></h1>
+  <p>Полный справочник экономики сервера: где, сколько и как фармить монеты — с точными цифрами и таблицами.</p>
+  <div class="ip">Играть: <b>mc.WarNight.net</b></div>
+</header>
+
+<div class="controls">
+  <div class="wrap">
+    <div class="row">
+      <input id="search" type="text" placeholder="🔎 Поиск способа заработка… (земля, мобы, bedwars, банк…)" autocomplete="off">
+      <div class="chips" id="chips">
+        <span class="chip active" data-f="all">Все</span>
+        <span class="chip" data-f="active">⛏ Актив</span>
+        <span class="chip" data-f="passive">💤 Пассив</span>
+        <span class="chip" data-f="game">🎮 Игры</span>
+        <span class="chip" data-f="risk">🎲 Риск</span>
+        <span class="chip" data-f="social">🤝 Между игроками</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- CORE LOOP -->
+  <div class="loop">
+    <h2>🔁 Главный цикл сервера</h2>
+    <div class="loopsteps">
+      <div class="step"><div class="n">ШАГ 1</div><div class="t">⛏ Копай землю</div><div class="d">Каждый блок земли = <b style="color:var(--gold)">+1 монета</b> сразу на баланс</div><span class="ar">→</span></div>
+      <div class="step"><div class="n">ШАГ 2</div><div class="t">📦 Собирай ресурсы</div><div class="d">Песок, глину, древние обломки и др. из шахты</div><span class="ar">→</span></div>
+      <div class="step"><div class="n">ШАГ 3</div><div class="t">💸 Продай Скупщику</div><div class="d"><span class="cmd">/seller</span> — превращай ресурсы в монеты</div><span class="ar">→</span></div>
+      <div class="step"><div class="n">ШАГ 4</div><div class="t">⚡ Прокачай лопату</div><div class="d"><span class="cmd">/upgrade</span> — копай быстрее, зарабатывай больше</div></div>
+    </div>
+    <div class="note" style="margin-top:16px">💡 Новые игроки стартуют с <b>0 монет</b>. Возьми стартовый набор <span class="cmd">/kit start</span>, бери лопату и в шахту — <span class="cmd">/warp mine</span>.</div>
+  </div>
+
+  <!-- COMPARISON TABLE -->
+  <h2 class="sec">📊 Сравнение всех способов</h2>
+  <p class="sec-sub">Кликни по заголовку столбца, чтобы отсортировать. Цифры — это монеты ($).</p>
+  <div class="tablewrap">
+    <table class="sortable" id="cmp">
+      <thead>
+        <tr>
+          <th>Способ</th>
+          <th>Тип</th>
+          <th data-type="num">Доход</th>
+          <th>Как / где</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><a href="#dig">⛏ Копать землю</a></td><td><span class="tag t-active">актив</span></td><td data-sort="1"><span class="amt">1 / блок</span></td><td>Любая земля, <span class="cmd">/warp mine</span></td></tr>
+        <tr><td><a href="#seller">💸 Скупщик</a></td><td><span class="tag t-active">актив</span></td><td data-sort="110"><span class="amt">1–120 / шт.</span></td><td><span class="cmd">/seller</span></td></tr>
+        <tr><td><a href="#coins">🪙 Монеты с мобов/руды</a></td><td><span class="tag t-active">актив</span></td><td data-sort="24"><span class="amt">4–24 / моб</span></td><td>Убивай мобов, копай руду</td></tr>
+        <tr><td><a href="#bedwars">🛏 BedWars</a></td><td><span class="tag t-game">игра</span></td><td data-sort="5000"><span class="amt">500–5 000</span></td><td><span class="cmd">/join</span> / НПС</td></tr>
+        <tr><td><a href="#playtime">⏱ Награды за онлайн</a></td><td><span class="tag t-passive">пассив</span></td><td data-sort="500000"><span class="amt">20–500 000</span></td><td>Просто играй</td></tr>
+        <tr><td><a href="#lucky">🎁 Угадай-розыгрыш</a></td><td><span class="tag t-game">игра</span></td><td data-sort="10000"><span class="amt">2 000–10 000</span></td><td>Пиши ответ в чат</td></tr>
+        <tr><td><a href="#crypto">📈 Банк / Биржа</a></td><td><span class="tag t-risk">риск</span></td><td data-sort="9999"><span class="amt">±%</span></td><td><span class="cmd">/crypto</span></td></tr>
+        <tr><td><a href="#airdrop">🪂 Аирдропы</a></td><td><span class="tag t-active">актив</span></td><td data-sort="200"><span class="amt">лут → продажа</span></td><td>Онлайн ≥ 10 игроков</td></tr>
+        <tr><td><a href="#npc">👆 НПС-монетка</a></td><td><span class="tag t-active">актив</span></td><td data-sort="1"><span class="amt">1 / клик</span></td><td>НПС на спавне</td></tr>
+        <tr><td><a href="#pay">🤝 Перевод / обмен</a></td><td><span class="tag t-social">соц.</span></td><td data-sort="0"><span class="amt">любая</span></td><td><span class="cmd">/pay</span>, <span class="cmd">/trade</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- METHODS -->
+  <h2 class="sec">📚 Подробное описание</h2>
+  <p class="sec-sub">Используй поиск и фильтры сверху, чтобы быстро найти нужный способ.</p>
+
+  <div class="cards" id="cards">
+
+    <!-- DIG -->
+    <article class="method" id="dig" data-cat="active" data-key="копать земля дёрн dirt лопата шахта warp mine основной">
+      <div class="head">
+        <div class="icon">⛏</div>
+        <div class="htext">
+          <h3>Копать землю <span class="pay">+1 монета за блок</span></h3>
+          <div class="meta"><span class="tag t-active">актив</span><span class="tag t-passive">основной доход</span></div>
+        </div>
+      </div>
+      <div class="body">
+        <p>Это <b>сердце сервера</b>. За каждый сломанный блок <b>земли (Dirt)</b> тебе моментально падает <b>+1 монета</b> на баланс (видно в action-bar внизу экрана).</p>
+        <ul class="clean">
+          <li>Работает во всём основном мире на высоте <b>Y от −63 до 63</b>.</li>
+          <li>Сломанная земля <b>автоматически восстанавливается</b> примерно каждые <b>10 минут</b> — копать можно бесконечно.</li>
+          <li>Специальная авто-шахта <span class="cmd">/warp mine</span> сбрасывается <b>каждые 5 минут</b> и заполнена ценными блоками на продажу.</li>
+        </ul>
+
+        <div class="note good">🔑 Чем лучше лопата — тем быстрее копаешь и тем больше монет в минуту. Прокачка лопаты <b>бесплатна</b> (нужно лишь общее количество выкопанной земли):</div>
+
+        <div class="tablewrap" style="margin-top:12px">
+          <table>
+            <thead><tr><th>Уровень</th><th>Лопата</th><th>Зачарование</th><th>Нужно выкопать земли</th><th>Команда</th></tr></thead>
+            <tbody>
+              <tr><td>I</td><td>🪓 Железная</td><td>Эффективность I</td><td><span class="amt">100</span></td><td rowspan="4" style="vertical-align:middle"><span class="cmd">/upgrade</span></td></tr>
+              <tr><td>II</td><td>✨ Золотая</td><td>Эффективность I</td><td><span class="amt">1 000</span></td></tr>
+              <tr><td>III</td><td>💎 Алмазная</td><td>Эффективность III</td><td><span class="amt">5 000</span></td></tr>
+              <tr><td>IV</td><td>🖤 Незеритовая</td><td>Эффективность V</td><td><span class="amt">10 000</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- calculator -->
+        <div class="calc" style="margin-top:14px">
+          <div>
+            <label for="calcIn">Сколько блоков копаешь</label>
+            <input id="calcIn" type="number" min="0" value="1000" inputmode="numeric">
+          </div>
+          <div class="out">
+            <div class="big" id="calcCoins">1 000 монет</div>
+            <div class="sub" id="calcTier">Хватит на лопату II уровня (нужно 1 000)</div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- SELLER -->
+    <article class="method" id="seller" data-cat="active" data-key="скупщик seller продать продажа ресурсы песок земля обсидиан древние обломки уголь паутина">
+      <div class="head">
+        <div class="icon">💸</div>
+        <div class="htext">
+          <h3>Скупщик <span class="pay">1–120 монет за предмет</span></h3>
+          <div class="meta"><span class="tag t-active">актив</span></div>
+        </div>
+      </div>
+      <div class="body">
+        <p>Открой <span class="cmd">/seller</span> (или подойди к НПС «Скупщик» на спавне) и продай добытые ресурсы. <b>Цены плавающие</b> — колеблются между минимумом и максимумом и обновляются периодически. Продавай, когда цена выше!</p>
+
+        <div class="tablewrap">
+          <table class="sortable">
+            <thead><tr><th>Ресурс</th><th data-type="num">Цена за штуку</th><th>Примечание</th></tr></thead>
+            <tbody>
+              <tr><td>Земля (Dirt)</td><td data-sort="5"><span class="amt">1 – 5</span></td><td>безлимит</td></tr>
+              <tr><td>Песок (Sand)</td><td data-sort="10"><span class="amt">2 – 10</span></td><td>безлимит</td></tr>
+              <tr><td>Красный песок</td><td data-sort="20"><span class="amt">3 – 20</span></td><td>безлимит</td></tr>
+              <tr><td>Гравий (Gravel)</td><td data-sort="10"><span class="amt">2 – 10</span></td><td>безлимит</td></tr>
+              <tr><td>Грязь (Mud)</td><td data-sort="10"><span class="amt">2 – 10</span></td><td>безлимит</td></tr>
+              <tr><td>Корни мангра</td><td data-sort="15"><span class="amt">3 – 15</span></td><td>безлимит</td></tr>
+              <tr><td>Ком глины</td><td data-sort="4"><span class="amt">2 – 4</span></td><td>безлимит</td></tr>
+              <tr><td>Булыжник</td><td data-sort="4"><span class="amt">2 – 4</span></td><td>безлимит</td></tr>
+              <tr><td>Стрела</td><td data-sort="5"><span class="amt">4 – 5</span></td><td>безлимит</td></tr>
+              <tr><td>Уголь</td><td data-sort="50"><span class="amt">5 – 50</span></td><td>безлимит</td></tr>
+              <tr><td>Нить</td><td data-sort="40"><span class="amt">10 – 40</span></td><td>безлимит</td></tr>
+              <tr><td>Перо</td><td data-sort="40"><span class="amt">10 – 40</span></td><td>безлимит</td></tr>
+              <tr><td>Кремень</td><td data-sort="40"><span class="amt">10 – 40</span></td><td>безлимит</td></tr>
+              <tr><td>Порох</td><td data-sort="40"><span class="amt">10 – 40</span></td><td>безлимит</td></tr>
+              <tr><td>Бирка (Name Tag)</td><td data-sort="40"><span class="amt">10 – 40</span></td><td>безлимит</td></tr>
+              <tr><td>Кварц</td><td data-sort="40"><span class="amt">10 – 40</span></td><td>безлимит</td></tr>
+              <tr><td>Мембрана фантома</td><td data-sort="40"><span class="amt">10 – 40</span></td><td>безлимит</td></tr>
+              <tr><td>Шкура кролика</td><td data-sort="60"><span class="amt">10 – 60</span></td><td>безлимит</td></tr>
+              <tr><td>Бурый гриб</td><td data-sort="80"><span class="amt">20 – 80</span></td><td>безлимит</td></tr>
+              <tr><td>Железный слиток</td><td data-sort="80"><span class="amt">20 – 80</span></td><td>безлимит</td></tr>
+              <tr><td>Паутина (Cobweb)</td><td data-sort="120"><span class="amt">90 – 120</span></td><td>безлимит</td></tr>
+              <tr><td>Обсидиан</td><td data-sort="70"><span class="amt">20 – 70</span></td><td>🔒 лимит 500 шт.</td></tr>
+              <tr><td>Древние обломки</td><td data-sort="110"><span class="amt">100 – 110</span></td><td>🔒 лимит 500 шт.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note">🔒 «Лимитные» товары (обсидиан, древние обломки) можно продать не более <b>500 шт.</b> за период, цена на них обновляется чаще (раз в ~30 мин). Самый дорогой массовый товар — <b>паутина</b> (до 120 за штуку).</div>
+      </div>
+    </article>
+
+    <!-- COINS PLUGIN -->
+    <article class="method" id="coins" data-cat="active" data-key="монеты мобы руда pvp убийство дракон визер withdraw физические подбирать">
+      <div class="head">
+        <div class="icon">🪙</div>
+        <div class="htext">
+          <h3>Монеты с мобов, руды и PvP <span class="pay">4–24+ за моба</span></h3>
+          <div class="meta"><span class="tag t-active">актив</span></div>
+        </div>
+      </div>
+      <div class="body">
+        <p>С убитых мобов, добытой руды и убитых игроков выпадают физические <b>🌻 Монеты</b> — подбери их, и сумма зачислится на баланс (показ в action-bar: <span class="cmd">+ $сумма</span>).</p>
+
+        <p><b>👹 Враждебные мобы</b> — шанс выпадения <b>50%</b>, падает <b>$4–24</b> с моба:</p>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Источник</th><th>Множитель</th><th>Итог</th></tr></thead>
+            <tbody>
+              <tr><td>Обычный враждебный моб</td><td>×1</td><td><span class="amt">4 – 24</span></td></tr>
+              <tr><td>🐉 Эндер Дракон</td><td>×20</td><td><span class="amt">≈ 80 – 480</span></td></tr>
+              <tr><td>💀 Визер</td><td>×10</td><td><span class="amt">≈ 40 – 240</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <ul class="clean">
+          <li>Чары <b>«Добыча»</b> на оружии: +5% монет за уровень (I → +5%, III → +15%).</li>
+          <li>Мирные мобы (коровы, овцы) и мобы из <b>спавнеров</b> монеты <b>не дают</b>.</li>
+        </ul>
+
+        <p style="margin-top:14px"><b>⛏ Добыча руды</b> — шанс <b>20%</b> уронить монеты (не работает с «Шёлковым касанием»). Множитель зависит от руды:</p>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Руда</th><th data-type="num">Множитель монет</th></tr></thead>
+            <tbody>
+              <tr><td>Спавнер</td><td><span class="amt">×5</span></td></tr>
+              <tr><td>Глубинная алмазная руда</td><td><span class="amt">×3</span></td></tr>
+              <tr><td>Алмазная / Изумрудная руда</td><td><span class="amt">×2</span></td></tr>
+              <tr><td>Золото, железо, медь, лазурит, кварц, уголь, редстоун (и глубинные)</td><td><span class="amt">×1</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p style="margin-top:14px"><b>⚔ PvP-убийства:</b> при убийстве другого игрока с него выпадают монеты. Фарм с одного IP (альты) заблокирован.</p>
+
+        <div class="note">💼 Команда <span class="cmd">/withdraw &lt;сумма&gt;</span> превращает баланс в физические монеты (до 10 000 за раз) — можно хранить в сундуке или передавать. Подбор/правый клик возвращает их на баланс.</div>
+        <div class="note warn">☠️ <b>Осторожно:</b> при смерти ты теряешь <b>5–15% баланса</b> — он выпадает на землю. Не носи все монеты с собой, держи их в банке <span class="cmd">/crypto</span> или на счету.</div>
+      </div>
+    </article>
+
+    <!-- BEDWARS -->
+    <article class="method" id="bedwars" data-cat="game" data-key="bedwars бедварс кровать мини-игра кил победа арена join">
+      <div class="head">
+        <div class="icon">🛏</div>
+        <div class="htext">
+          <h3>BedWars <span class="pay">до 5 000 монет</span></h3>
+          <div class="meta"><span class="tag t-game">мини-игра</span></div>
+        </div>
+      </div>
+      <div class="body">
+        <p>Заходи в мини-игру через <span class="cmd">/join</span> или НПС на спавне. За действия в матче начисляются <b>монеты прямо на основной баланс</b>:</p>
+        <div class="tablewrap">
+          <table class="sortable">
+            <thead><tr><th>Действие</th><th data-type="num">Награда</th></tr></thead>
+            <tbody>
+              <tr><td>🗡 Убийство игрока</td><td data-sort="500"><span class="amt">500</span></td></tr>
+              <tr><td>💀 Финальное убийство</td><td data-sort="3000"><span class="amt">3 000</span></td></tr>
+              <tr><td>🏆 Победа в матче</td><td data-sort="3000"><span class="amt">3 000</span></td></tr>
+              <tr><td>🛏 Уничтожение кровати</td><td data-sort="5000"><span class="amt">5 000</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note good">🏆 Один удачный матч с уничтожением кровати и победой может принести <b>8 000+ монет</b> — самый быстрый способ для тех, кто любит PvP.</div>
+      </div>
+    </article>
+
+    <!-- PLAYTIME -->
+    <article class="method" id="playtime" data-cat="passive" data-key="время онлайн playtime награда час сутки пассив афк">
+      <div class="head">
+        <div class="icon">⏱</div>
+        <div class="htext">
+          <h3>Награды за время игры <span class="pay">до 500 000 монет</span></h3>
+          <div class="meta"><span class="tag t-passive">пассив</span></div>
+        </div>
+      </div>
+      <div class="body">
+        <p>Просто играя на сервере, ты копишь время онлайн и получаешь монеты. Часть наград приходит <b>автоматически</b>, разовые — забираются в меню наград за онлайн.</p>
+
+        <p><b>♻️ Повторяющиеся (авто):</b></p>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Как часто</th><th data-type="num">Награда</th><th>Бонус</th></tr></thead>
+            <tbody>
+              <tr><td>Каждый 1 час онлайн</td><td><span class="amt">+20</span></td><td>+ лечение</td></tr>
+              <tr><td>Каждые 24 часа наигранного</td><td><span class="amt">+2 000</span></td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p style="margin-top:14px"><b>🎯 Разовые рубежи</b> (за общее наигранное время):</p>
+        <div class="tablewrap">
+          <table class="sortable">
+            <thead><tr><th>Наиграно</th><th data-type="num">Награда</th></tr></thead>
+            <tbody>
+              <tr><td>1 час</td><td data-sort="500"><span class="amt">500</span></td></tr>
+              <tr><td>6 часов</td><td data-sort="2000"><span class="amt">2 000</span></td></tr>
+              <tr><td>12 часов</td><td data-sort="5000"><span class="amt">5 000</span></td></tr>
+              <tr><td>24 часа</td><td data-sort="15000"><span class="amt">15 000</span></td></tr>
+              <tr><td>7 дней</td><td data-sort="50000"><span class="amt">50 000</span></td></tr>
+              <tr><td>30 дней</td><td data-sort="500000"><span class="amt">500 000</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note">💤 Идеально сочетается с любым другим занятием: копай землю или сиди на спавне — время онлайн капает само.</div>
+      </div>
+    </article>
+
+    <!-- LUCKY -->
+    <article class="method" id="lucky" data-cat="game" data-key="угадай розыгрыш lucky crate приз чат число удача">
+      <div class="head">
+        <div class="icon">🎁</div>
+        <div class="htext">
+          <h3>Угадай-розыгрыш <span class="pay">2 000–10 000 монет</span></h3>
+          <div class="meta"><span class="tag t-game">игра</span></div>
+        </div>
+      </div>
+      <div class="body">
+        <p>Время от времени сервер запускает розыгрыш: нужно <b>угадать загаданное и написать ответ в чат</b>. Первый, кто угадал, получает приз.</p>
+        <ul class="clean">
+          <li>Награда за победу: <b class="amt" style="color:var(--gold)">2 000 – 10 000 монет</b>.</li>
+          <li>После победы — глобальная пауза <b>60 минут</b> до следующего розыгрыша.</li>
+        </ul>
+        <div class="note">👀 Следи за чатом — реакция решает! Это бесплатный шанс сорвать крупную сумму.</div>
+      </div>
+    </article>
+
+    <!-- CRYPTO / BANK -->
+    <article class="method" id="crypto" data-cat="risk" data-key="банк биржа crypto криптовалюта вклад депозит прибыль курс hamsterbank инвестиции">
+      <div class="head">
+        <div class="icon">📈</div>
+        <div class="htext">
+          <h3>Банк / Биржа <span class="pay">±% прибыли</span></h3>
+          <div class="meta"><span class="tag t-risk">риск</span></div>
+        </div>
+      </div>
+      <div class="body">
+        <p>Открой <span class="cmd">/crypto</span> и внеси монеты на «биржевой» счёт. <b>Курс меняется каждые 10 минут</b> — баланс может вырасти или упасть. Это способ <b>приумножить</b> накопления (или потерять часть), а также безопасно хранить монеты от потери при смерти.</p>
+        <ul class="clean">
+          <li>В меню видно историю изменений курса за последние 2 часа — анализируй тренд перед вкладом.</li>
+          <li>Депозит — кнопка «Депозит», вывод — «Вывод».</li>
+        </ul>
+
+        <p style="margin-top:12px"><b>💎 Бонус к прибыли и лимит счёта зависят от привилегии (доната):</b></p>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Привилегия</th><th>Бонус к прибыли</th><th>Макс. на счету</th></tr></thead>
+            <tbody>
+              <tr><td>Без привилегии</td><td>—</td><td>базовый</td></tr>
+              <tr><td>Хитман</td><td><span class="amt">+20%</span></td><td>250 000</td></tr>
+              <tr><td>Титан</td><td><span class="amt">+50%</span></td><td>500 000</td></tr>
+              <tr><td>Эндер</td><td><span class="amt">+100%</span></td><td>1 000 000</td></tr>
+              <tr><td>Креатив</td><td><span class="amt">+200%</span></td><td>2 500 000</td></tr>
+              <tr><td>Спонсор</td><td><span class="amt">+500%</span></td><td>10 000 000</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note warn">🎲 Это рискованный способ: курс может уйти вниз. Не вкладывай больше, чем готов потерять.</div>
+      </div>
+    </article>
+
+    <!-- AIRDROP -->
+    <article class="method" id="airdrop" data-cat="active" data-key="аирдроп airdrop ящик лут падение титан хитман булава тотем снаряжение">
+      <div class="head">
+        <div class="icon">🪂</div>
+        <div class="htext">
+          <h3>Аирдропы <span class="pay">ценный лут → продажа</span></h3>
+          <div class="meta"><span class="tag t-active">актив</span></div>
+        </div>
+      </div>
+      <div class="body">
+        <p>На карте падают аирдропы с топовым лутом. Прямых монет внутри нет, но добыча <b>экономит тысячи монет</b> на снаряжении, а излишки можно продать Скупщику или другим игрокам.</p>
+        <ul class="clean">
+          <li>Появляются, когда онлайн <b>не меньше 10 игроков</b> (шанс ~50%).</li>
+          <li>Открыть можно через <b>5 минут</b> после падения; исчезает через <b>15 минут</b>.</li>
+          <li>Внутри: сеты брони «Титана»/«Хитмана», незеритовое оружие, лук/арбалет, ⚒ Булава, тотемы, золотые яблоки, обсидиан и редкие зелья.</li>
+        </ul>
+        <div class="note">⚔ За аирдропы часто идёт борьба — это и риск, и возможность зафармить экипировку без затрат.</div>
+      </div>
+    </article>
+
+    <!-- NPC -->
+    <article class="method" id="npc" data-cat="active" data-key="нпс монетка клик спавн старт новичок">
+      <div class="head">
+        <div class="icon">👆</div>
+        <div class="htext">
+          <h3>НПС-монетка <span class="pay">+1 монета за клик</span></h3>
+          <div class="meta"><span class="tag t-active">старт</span></div>
+        </div>
+      </div>
+      <div class="body">
+        <p>На спавне есть особый НПС: <b>левый клик</b> по нему даёт <b>+1 монету</b> («Вы получили монетку»). Мелочь, но помогает новичкам сделать самые первые монеты, пока нет лопаты.</p>
+        <div class="note">🐣 Подходит только для старта — копать землю в разы выгоднее.</div>
+      </div>
+    </article>
+
+    <!-- PAY / TRADE -->
+    <article class="method" id="pay" data-cat="social" data-key="pay trade перевод обмен передать игроку торговля деньги">
+      <div class="head">
+        <div class="icon">🤝</div>
+        <div class="htext">
+          <h3>Перевод и обмен между игроками</h3>
+          <div class="meta"><span class="tag t-social">между игроками</span></div>
+        </div>
+      </div>
+      <div class="body">
+        <ul class="clean">
+          <li><span class="cmd">/pay &lt;ник&gt; &lt;сумма&gt;</span> — перевести монеты другому игроку.</li>
+          <li><span class="cmd">/trade &lt;ник&gt;</span> — безопасный обмен предметами и монетами (защита от обмана).</li>
+        </ul>
+        <div class="note">🤝 Продавай добычу, услуги или ресурсы другим игрокам напрямую — рынок устанавливаешь сам.</div>
+      </div>
+    </article>
+
+  </div>
+
+  <div class="empty" id="empty">😕 Ничего не найдено. Попробуй другой запрос или сбрось фильтр.</div>
+
+  <!-- SPEND -->
+  <h2 class="sec">🛒 Куда тратить монеты</h2>
+  <p class="sec-sub">Чтобы понимать, ради чего фармить. Раскрой список.</p>
+  <details class="spend">
+    <summary>Магазины, прокачка и привилегии</summary>
+    <div class="inner">
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Что</th><th>Команда / НПС</th><th>Цена (монеты)</th></tr></thead>
+          <tbody>
+            <tr><td>⚡ Прокачка лопаты</td><td><span class="cmd">/upgrade</span></td><td>бесплатно (за выкопанную землю)</td></tr>
+            <tr><td>⚔ Оружейник — броня и оружие</td><td><span class="cmd">/gunner</span></td><td>32 – 1 536</td></tr>
+            <tr><td>🍖 Фермер — еда</td><td><span class="cmd">/fermer</span></td><td>16 – 256+</td></tr>
+            <tr><td>🧱 Магазин блоков и инструментов</td><td>панель / <span class="cmd">/fitter</span></td><td>64 – 19 999</td></tr>
+            <tr><td>🏠 Приват-блок 5×5</td><td>магазин блоков</td><td>384</td></tr>
+            <tr><td>📈 Вклад в банк/биржу</td><td><span class="cmd">/crypto</span></td><td>любая сумма</td></tr>
+            <tr><td>🐻 Ежедневная «дань мишке»</td><td>BearMoney</td><td>5 000 / день</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note">💳 <b>Привилегии (Хитман, Титан, Эндер, Креатив, Спонсор)</b> покупаются за рубли на сайте-магазине, а не за монеты. Они дают бонус к прибыли в <span class="cmd">/crypto</span>, больше регионов/домов и удобные команды.</div>
+    </div>
+  </details>
+
+  <!-- TIPS -->
+  <h2 class="sec">🏆 Советы по быстрому заработку</h2>
+  <div class="cards">
+    <article class="method"><div class="body">
+      <ul class="clean">
+        <li>🥇 <b>Прокачай лопату до максимума</b> как можно раньше — Незеритовая (Эффективность V) копает землю молниеносно, а это +1 монета за каждый блок.</li>
+        <li>📈 <b>Продавай Скупщику на пике цены.</b> Цены плавают — паутина, бурый гриб и железо дают больше всего за штуку.</li>
+        <li>💤 <b>Не выходи без причины:</b> награды за онлайн капают сами (до 500 000 за 30 дней игры).</li>
+        <li>🛏 <b>Любишь PvP?</b> BedWars — самые крупные разовые суммы (до 5 000 за кровать).</li>
+        <li>🏦 <b>Храни монеты в <span class="cmd">/crypto</span></b>, чтобы не терять 5–15% при смерти, а с донат-бонусом ещё и приумножать.</li>
+        <li>👀 <b>Лови розыгрыши в чате</b> — до 10 000 монет за один правильный ответ.</li>
+        <li>🪂 <b>Собирай аирдропы</b> — бесплатное снаряжение экономит твои монеты.</li>
+      </ul>
+    </div></article>
+  </div>
+
+</div>
+
+<footer>
+  💛 Wiki заработка монет • сервер <b>WarNight</b> (mc.WarNight.net)<br>
+  Цифры взяты из текущих настроек сервера и могут меняться с обновлениями.
+</footer>
+
+<button id="top" title="Наверх">↑</button>
+
+<script>
+(function(){
+  var search = document.getElementById('search');
+  var chips  = document.querySelectorAll('.chip');
+  var cards  = Array.prototype.slice.call(document.querySelectorAll('#cards .method'));
+  var empty  = document.getElementById('empty');
+  var activeFilter = 'all';
+
+  function norm(s){ return (s||'').toLowerCase().replace(/ё/g,'е'); }
+
+  function apply(){
+    var q = norm(search.value.trim());
+    var shown = 0;
+    cards.forEach(function(c){
+      var cat = c.getAttribute('data-cat') || '';
+      var key = norm(c.getAttribute('data-key') + ' ' + c.textContent);
+      var okCat = (activeFilter === 'all') || (cat === activeFilter);
+      var okText = !q || key.indexOf(q) !== -1;
+      var show = okCat && okText;
+      c.style.display = show ? '' : 'none';
+      if(show) shown++;
+    });
+    empty.style.display = shown ? 'none' : 'block';
+  }
+
+  search.addEventListener('input', apply);
+  chips.forEach(function(ch){
+    ch.addEventListener('click', function(){
+      chips.forEach(function(x){x.classList.remove('active')});
+      ch.classList.add('active');
+      activeFilter = ch.getAttribute('data-f');
+      apply();
+    });
+  });
+
+  // sortable tables
+  document.querySelectorAll('table.sortable').forEach(function(tbl){
+    var ths = tbl.querySelectorAll('thead th');
+    ths.forEach(function(th, idx){
+      var dir = 1;
+      th.addEventListener('click', function(){
+        var tb = tbl.querySelector('tbody');
+        var rows = Array.prototype.slice.call(tb.querySelectorAll('tr'));
+        var isNum = th.getAttribute('data-type') === 'num';
+        rows.sort(function(a,b){
+          var ca = a.children[idx], cb = b.children[idx];
+          var va, vb;
+          if(isNum){
+            va = parseFloat(ca.getAttribute('data-sort') || ca.textContent.replace(/[^\d.\-]/g,'')) || 0;
+            vb = parseFloat(cb.getAttribute('data-sort') || cb.textContent.replace(/[^\d.\-]/g,'')) || 0;
+          } else {
+            va = ca.textContent.trim().toLowerCase();
+            vb = cb.textContent.trim().toLowerCase();
+          }
+          if(va < vb) return -1*dir;
+          if(va > vb) return 1*dir;
+          return 0;
+        });
+        dir *= -1;
+        rows.forEach(function(r){ tb.appendChild(r); });
+      });
+    });
+  });
+
+  // dirt calculator
+  var calcIn = document.getElementById('calcIn');
+  var calcCoins = document.getElementById('calcCoins');
+  var calcTier = document.getElementById('calcTier');
+  var tiers = [
+    {n:'IV уровня (Незеритовая)', need:10000},
+    {n:'III уровня (Алмазная)',   need:5000},
+    {n:'II уровня (Золотая)',     need:1000},
+    {n:'I уровня (Железная)',     need:100}
+  ];
+  function fmt(n){ return n.toLocaleString('ru-RU'); }
+  function calc(){
+    var b = Math.max(0, parseInt(calcIn.value,10) || 0);
+    calcCoins.textContent = fmt(b) + (b===1?' монета':' монет');
+    var reached = null;
+    for(var i=0;i<tiers.length;i++){ if(b >= tiers[i].need){ reached = tiers[i]; break; } }
+    if(reached){
+      calcTier.textContent = 'Открыта лопата ' + reached.n + ' ✅';
+    } else {
+      var next = tiers[tiers.length-1];
+      calcTier.textContent = 'До лопаты I уровня осталось выкопать ' + fmt(next.need - b);
+    }
+  }
+  if(calcIn){ calcIn.addEventListener('input', calc); calc(); }
+
+  // back to top
+  var topBtn = document.getElementById('top');
+  window.addEventListener('scroll', function(){
+    if(window.scrollY > 600) topBtn.classList.add('show'); else topBtn.classList.remove('show');
+  });
+  topBtn.addEventListener('click', function(){ window.scrollTo({top:0, behavior:'smooth'}); });
+})();
+</script>
+</body>
+</html>
