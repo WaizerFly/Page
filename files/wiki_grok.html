@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⛏ MineGame • Заработок Монет — Полный Гайд</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap');
+        
+        :root {
+            --gold: #f4d03f;
+            --dark: #0f172a;
+        }
+        
+        body {
+            font-family: 'Inter', system_ui, sans-serif;
+        }
+        
+        .minecraft-font {
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            letter-spacing: 0.5px;
+        }
+
+        .section-header {
+            background: linear-gradient(90deg, #1e2937, #334155);
+            border-left: 5px solid #f4d03f;
+        }
+
+        .coin-gold {
+            color: #f4d03f;
+            text-shadow: 0 0 10px rgba(244, 208, 63, 0.5);
+        }
+
+        .method-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .method-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        .nav-pill {
+            transition: all 0.2s ease;
+        }
+        
+        .nav-pill.active {
+            background-color: #f4d03f;
+            color: #0f172a;
+            font-weight: 700;
+        }
+
+        .stat-badge {
+            font-size: 0.75rem;
+            padding: 1px 9px;
+            border-radius: 9999px;
+            font-weight: 600;
+        }
+
+        .income-high { background: #166534; color: #86efac; }
+        .income-medium { background: #854d0e; color: #fde047; }
+        .income-passive { background: #1e40af; color: #93c5fd; }
+        .income-risk { background: #9f1239; color: #fda4af; }
+
+        .mc-table {
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        
+        .mc-table th {
+            background: #1e2937;
+            color: #f4d03f;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .mc-table td, .mc-table th {
+            border: 1px solid #334155;
+            padding: 10px 14px;
+        }
+
+        .minecraft-btn {
+            transition: all 0.1s ease;
+            box-shadow: 0 4px 0 #854d0e;
+        }
+        
+        .minecraft-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #854d0e;
+        }
+
+        .wiki-container {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .coin-particle {
+            animation: coin-float 2s ease forwards;
+        }
+
+        .data-table-container {
+            scrollbar-width: thin;
+            scrollbar-color: #475569 #1e2937;
+        }
+
+        .filter-chip {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .search-input {
+            background: #1e2937;
+            border: 2px solid #475569;
+            transition: border 0.2s;
+        }
+        
+        .search-input:focus {
+            border-color: #f4d03f;
+            outline: none;
+        }
+
+        .wiki-card {
+            background: #1e2937;
+            border: 1px solid #334155;
+        }
+        
+        .detail-row {
+            border-bottom: 1px solid #334155;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-200">
+    <!-- HEADER -->
+    <header class="border-b border-slate-800 bg-slate-900/70 backdrop-blur-lg sticky top-0 z-50">
+        <div class="max-w-screen-2xl mx-auto">
+            <div class="px-6 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-x-4">
+                    <div class="flex items-center gap-x-3">
+                        <div class="w-11 h-11 bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center rounded-xl shadow-inner">
+                            <i class="fa-solid fa-coins text-slate-900 text-3xl"></i>
+                        </div>
+                        <div>
+                            <div class="font-bold text-3xl tracking-tighter">MineGame</div>
+                            <div class="text-[10px] text-amber-400 -mt-1 font-mono">СЕРВЕР С 2023</div>
+                        </div>
+                    </div>
+                    <div class="hidden md:block px-3 py-1 bg-slate-800 rounded-full text-sm border border-slate-700">
+                        <span class="text-emerald-400">●</span> 
+                        <span class="font-semibold">Онлайн: 127</span>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-x-2">
+                    <div onclick="copyToClipboard('/spawn')" 
+                         class="flex items-center gap-x-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-sm cursor-pointer border border-slate-700">
+                        <i class="fa-solid fa-home text-amber-400"></i>
+                        <span class="font-medium">/spawn</span>
+                    </div>
+                    <div onclick="copyToClipboard('/seller')" 
+                         class="flex items-center gap-x-2 px-4 py-2 bg-emerald-900/60 hover:bg-emerald-800 rounded-xl text-sm cursor-pointer border border-emerald-700">
+                        <i class="fa-solid fa-store text-emerald-400"></i>
+                        <span class="font-medium">/seller</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO -->
+    <div class="bg-gradient-to-b from-slate-900 to-slate-950 border-b border-slate-800">
+        <div class="max-w-screen-2xl mx-auto px-6 pt-10 pb-8">
+            <div class="flex flex-col md:flex-row gap-8 items-center">
+                <div class="flex-1">
+                    <div class="inline-flex items-center gap-x-2 bg-slate-900 border border-slate-700 px-4 h-8 rounded-full mb-4">
+                        <div class="w-2 h-2 bg-emerald-400 animate-pulse rounded-full"></div>
+                        <span class="text-xs font-bold tracking-[1.5px] text-emerald-300">АКТУАЛЬНО НА ФЕВРАЛЬ 2026</span>
+                    </div>
+                    
+                    <h1 class="text-6xl md:text-7xl font-black tracking-tighter leading-none">
+                        КАК ЗАРАБОТАТЬ<br>
+                        <span class="coin-gold">МОНЕТЫ</span>
+                    </h1>
+                    <p class="mt-4 max-w-lg text-xl text-slate-400">
+                        Полный интерактивный справочник по всем способам заработка на нашем сервере
+                    </p>
+                    
+                    <div class="flex items-center gap-x-3 mt-6">
+                        <button onclick="document.getElementById('catalog').scrollIntoView({ behavior: 'smooth' })" 
+                                class="minecraft-btn px-8 h-12 bg-amber-400 hover:bg-amber-300 active:bg-amber-500 text-slate-900 font-extrabold rounded-2xl flex items-center gap-x-2 text-lg">
+                            <i class="fa-solid fa-list"></i>
+                            <span>КАТАЛОГ СПОСОБОВ</span>
+                        </button>
+                        <button onclick="document.getElementById('seller-table').scrollIntoView({ behavior: 'smooth' })" 
+                                class="h-12 px-6 border border-slate-700 hover:bg-slate-800 font-semibold rounded-2xl flex items-center gap-x-2">
+                            <i class="fa-solid fa-store"></i>
+                            <span>ЦЕНЫ СКУПЩИКА</span>
+                        </button>
+                    </div>
+                    
+                    <div class="mt-5 flex items-center gap-x-6 text-sm">
+                        <div class="flex items-center -space-x-2">
+                            <div class="w-6 h-6 bg-slate-700 border border-slate-600 rounded-full flex items-center justify-center ring-1 ring-offset-2 ring-offset-slate-950 ring-slate-800"><i class="fa-solid fa-shovel text-xs"></i></div>
+                            <div class="w-6 h-6 bg-slate-700 border border-slate-600 rounded-full flex items-center justify-center ring-1 ring-offset-2 ring-offset-slate-950 ring-slate-800"><i class="fa-solid fa-skull text-xs"></i></div>
+                            <div class="w-6 h-6 bg-slate-700 border border-slate-600 rounded-full flex items-center justify-center ring-1 ring-offset-2 ring-offset-slate-950 ring-slate-800"><i class="fa-solid fa-bed text-xs"></i></div>
+                        </div>
+                        <div class="text-slate-500 text-xs">13 проверенных способов</div>
+                    </div>
+                </div>
+                
+                <div class="flex-1 max-w-md w-full">
+                    <div class="wiki-card p-5 rounded-3xl">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fa-solid fa-lightbulb text-amber-400 text-xl"></i>
+                            <div class="font-bold">Самый быстрый старт</div>
+                        </div>
+                        <div class="text-sm leading-relaxed text-slate-300">
+                            1. Возьми лопату у спавна (/upgrade)<br>
+                            2. Иди в шахту: <span class="font-mono text-emerald-400">/warp mine</span><br>
+                            3. Копай 15–20 минут<br>
+                            4. Продай всё у скупщика: <span class="font-mono text-emerald-400">/seller</span>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-slate-700 text-xs flex justify-between items-center">
+                            <div class="text-emerald-400 font-semibold">≈ 800–1400 монет за 20 мин</div>
+                            <div onclick="copyToClipboard('/warp mine')" class="cursor-pointer px-3 py-1 bg-emerald-900/60 hover:bg-emerald-900 text-emerald-300 rounded-xl text-xs flex items-center gap-1">
+                                <i class="fa-solid fa-copy"></i> <span>СКОПИРОВАТЬ</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STATS BAR -->
+    <div class="max-w-screen-2xl mx-auto px-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 -mt-5">
+            <div class="bg-slate-900 border border-slate-700 rounded-2xl p-4 flex items-center gap-x-4">
+                <div class="text-4xl font-black coin-gold">1–5</div>
+                <div>
+                    <div class="text-xs text-slate-400">монет за 1 блок</div>
+                    <div class="font-semibold">ГРЯЗЬ / ПЕСОК</div>
+                </div>
+            </div>
+            <div class="bg-slate-900 border border-slate-700 rounded-2xl p-4 flex items-center gap-x-4">
+                <div class="text-4xl font-black coin-gold">70–200</div>
+                <div>
+                    <div class="text-xs text-slate-400">каждые 5 минут</div>
+                    <div class="font-semibold">AFK БАССЕЙН</div>
+                </div>
+            </div>
+            <div class="bg-slate-900 border border-slate-700 rounded-2xl p-4 flex items-center gap-x-4">
+                <div class="text-4xl font-black coin-gold">20</div>
+                <div>
+                    <div class="text-xs text-slate-400">автоматически</div>
+                    <div class="font-semibold">В ЧАС ОНЛАЙН</div>
+                </div>
+            </div>
+            <div class="bg-slate-900 border border-slate-700 rounded-2xl p-4 flex items-center gap-x-4">
+                <div class="text-4xl font-black coin-gold">500k</div>
+                <div>
+                    <div class="text-xs text-slate-400">за 30 дней</div>
+                    <div class="font-semibold">МАКС. НАГРАДА</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- QUICK FILTERS -->
+    <div id="catalog" class="max-w-screen-2xl mx-auto px-6 pt-10">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-y-3 mb-4">
+            <div>
+                <h2 class="font-black text-4xl tracking-tighter">Все способы заработка</h2>
+                <p class="text-slate-400 mt-0.5">Нажми на карточку для подробностей • Фильтруй по типу</p>
+            </div>
+            
+            <!-- Search -->
+            <div class="relative w-full sm:w-80">
+                <i class="fa-solid fa-search absolute left-4 top-3.5 text-slate-500"></i>
+                <input id="search-input" 
+                       onkeyup="filterMethods()"
+                       type="text" 
+                       placeholder="Поиск по названию или описанию..." 
+                       class="search-input w-full pl-11 h-11 rounded-2xl text-sm placeholder:text-slate-500">
+            </div>
+        </div>
+
+        <!-- Category filters -->
+        <div class="flex flex-wrap gap-2 mb-6" id="category-filters">
+            <div onclick="filterByCategory(this, 'all')" class="nav-pill active px-5 py-1.5 text-sm font-semibold bg-slate-800 rounded-3xl flex items-center gap-x-2 border border-slate-700">
+                <i class="fa-solid fa-th-large"></i> <span>ВСЕ</span>
+            </div>
+            <div onclick="filterByCategory(this, 'farm')" class="nav-pill px-5 py-1.5 text-sm font-semibold bg-slate-800 hover:bg-slate-700 rounded-3xl flex items-center gap-x-2 border border-slate-700 cursor-pointer">
+                <i class="fa-solid fa-shovel"></i> <span>ФАРМ / ПРОДАЖА</span>
+            </div>
+            <div onclick="filterByCategory(this, 'passive')" class="nav-pill px-5 py-1.5 text-sm font-semibold bg-slate-800 hover:bg-slate-700 rounded-3xl flex items-center gap-x-2 border border-slate-700 cursor-pointer">
+                <i class="fa-solid fa-bed"></i> <span>ПАССИВНЫЕ</span>
+            </div>
+            <div onclick="filterByCategory(this, 'pve')" class="nav-pill px-5 py-1.5 text-sm font-semibold bg-slate-800 hover:bg-slate-700 rounded-3xl flex items-center gap-x-2 border border-slate-700 cursor-pointer">
+                <i class="fa-solid fa-skull"></i> <span>PvE / МОБЫ</span>
+            </div>
+            <div onclick="filterByCategory(this, 'risk')" class="nav-pill px-5 py-1.5 text-sm font-semibold bg-slate-800 hover:bg-slate-700 rounded-3xl flex items-center gap-x-2 border border-slate-700 cursor-pointer">
+                <i class="fa-solid fa-skull-crossbones"></i> <span>РИСКОВАННЫЕ</span>
+            </div>
+            <div onclick="filterByCategory(this, 'special')" class="nav-pill px-5 py-1.5 text-sm font-semibold bg-slate-800 hover:bg-slate-700 rounded-3xl flex items-center gap-x-2 border border-slate-700 cursor-pointer">
+                <i class="fa-solid fa-gem"></i> <span>СПЕЦИАЛЬНЫЕ</span>
+            </div>
+        </div>
+
+        <!-- METHODS GRID -->
+        <div id="methods-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+            <!-- Populated by JS -->
+        </div>
+    </div>
+
+    <!-- PRIME SELLER TABLE -->
+    <div class="max-w-screen-2xl mx-auto px-6 pt-12" id="seller-table">
+        <div class="flex items-end justify-between mb-3">
+            <div>
+                <h3 class="font-black text-3xl flex items-center gap-x-3">
+                    <i class="fa-solid fa-store text-emerald-400"></i> 
+                    <span>Скупщик PrimeSeller</span>
+                </h3>
+                <p class="text-sm text-slate-400">Основной источник дохода. Цены обновляются автоматически.</p>
+            </div>
+            <div class="text-xs px-3 py-1 bg-emerald-900/40 border border-emerald-800 text-emerald-300 rounded-2xl font-medium flex items-center gap-1">
+                <i class="fa-solid fa-sync fa-sm"></i> <span>UNLIMITED: каждый час • LIMITED: 30 мин</span>
+            </div>
+        </div>
+
+        <div class="wiki-card rounded-3xl p-1">
+            <div class="overflow-auto data-table-container max-h-[480px]">
+                <table class="mc-table w-full text-sm" id="seller-table-el">
+                    <thead class="sticky top-0 z-10">
+                        <tr>
+                            <th onclick="sortSellerTable(0)" class="cursor-pointer rounded-tl-2xl text-left">ПРЕДМЕТ <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                            <th onclick="sortSellerTable(1)" class="cursor-pointer text-right">МИН. ЦЕНА</th>
+                            <th onclick="sortSellerTable(2)" class="cursor-pointer text-right">МАКС. ЦЕНА</th>
+                            <th onclick="sortSellerTable(3)" class="cursor-pointer rounded-tr-2xl text-center">ТИП</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-base" id="seller-tbody">
+                        <!-- filled by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="text-[10px] text-slate-500 mt-2 px-2">* Все цены указаны за 1 штуку. Продажа через <span class="font-mono text-emerald-400">/seller</span> или средняя кнопка мыши.</div>
+    </div>
+
+    <!-- PLAYTIME REWARDS -->
+    <div class="max-w-screen-2xl mx-auto px-6 pt-10">
+        <h3 class="font-black text-3xl mb-3 flex items-center gap-x-3">
+            <i class="fa-solid fa-clock text-sky-400"></i> 
+            <span>Награды за время игры (CMI)</span>
+        </h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Auto -->
+            <div class="wiki-card rounded-3xl p-5">
+                <div class="flex justify-between">
+                    <div>
+                        <div class="text-sky-400 text-sm font-bold">АВТОМАТИЧЕСКИЕ</div>
+                        <div class="text-2xl font-bold mt-1">20 монет / час</div>
+                    </div>
+                    <i class="fa-solid fa-play text-3xl text-sky-500/70 mt-1"></i>
+                </div>
+                <div class="mt-4 text-xs bg-slate-800 p-3 rounded-2xl">Начисляются автоматически каждые 3600 секунд онлайн.</div>
+            </div>
+            
+            <!-- Milestones -->
+            <div class="wiki-card rounded-3xl p-5 md:col-span-2">
+                <div class="text-sky-400 text-sm font-bold mb-2">ОДНОРАЗОВЫЕ НАГРАДЫ ЗА ОБЩИЙ ПЛЕЙТАЙМ</div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 text-sm">
+                    <div class="bg-slate-800 p-2.5 rounded-2xl flex justify-between"><span>1 час</span> <span class="font-bold coin-gold">500</span></div>
+                    <div class="bg-slate-800 p-2.5 rounded-2xl flex justify-between"><span>6 часов</span> <span class="font-bold coin-gold">2 000</span></div>
+                    <div class="bg-slate-800 p-2.5 rounded-2xl flex justify-between"><span>12 часов</span> <span class="font-bold coin-gold">5 000</span></div>
+                    <div class="bg-slate-800 p-2.5 rounded-2xl flex justify-between"><span>24 часа</span> <span class="font-bold coin-gold">15 000</span></div>
+                    <div class="bg-slate-800 p-2.5 rounded-2xl flex justify-between"><span>7 дней</span> <span class="font-bold coin-gold">50 000</span></div>
+                    <div class="bg-slate-800 p-2.5 rounded-2xl flex justify-between"><span>30 дней</span> <span class="font-bold coin-gold">500 000</span></div>
+                </div>
+                <div class="text-xs mt-2 text-slate-400">Используй <span class="font-mono text-amber-300">/cmi playtime</span> чтобы проверить прогресс.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AFK + VOTING + RANK -->
+    <div class="max-w-screen-2xl mx-auto px-6 pt-10 pb-12 grid md:grid-cols-3 gap-4">
+        <!-- AFK -->
+        <div class="wiki-card p-5 rounded-3xl">
+            <div class="flex gap-3">
+                <i class="fa-solid fa-water text-3xl text-cyan-400 mt-1"></i>
+                <div class="flex-1">
+                    <div class="font-bold text-lg">AFK Бассейн</div>
+                    <div class="text-emerald-400 font-semibold">70–200 монет + предмет</div>
+                    <div class="text-xs mt-3">Каждые 5 минут (300 сек). Регион <span class="font-mono">afkpool</span>.</div>
+                    <div onclick="copyToClipboard('/warp afkpool')" class="cursor-pointer mt-2 inline-block text-xs px-3 py-1 bg-cyan-900/50 hover:bg-cyan-900 rounded-2xl">/warp afkpool</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Voting -->
+        <div class="wiki-card p-5 rounded-3xl">
+            <div class="flex gap-3">
+                <i class="fa-solid fa-vote-yea text-3xl text-violet-400 mt-1"></i>
+                <div class="flex-1">
+                    <div class="font-bold text-lg">Голосование</div>
+                    <div class="space-y-1 mt-2 text-sm">
+                        <div class="flex justify-between"><span>10 голосов</span> <span class="font-bold">+100 монет</span></div>
+                        <div class="flex justify-between"><span>100 голосов</span> <span class="font-bold">+1000 + 32 алмаза</span></div>
+                    </div>
+                    <div class="mt-2 text-xs text-violet-300">Голосуй на мониторингах и получай награды автоматически.</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Rankup -->
+        <div class="wiki-card p-5 rounded-3xl">
+            <div class="flex gap-3">
+                <i class="fa-solid fa-level-up-alt text-3xl text-orange-400 mt-1"></i>
+                <div class="flex-1">
+                    <div class="font-bold text-lg">Повышение ранга</div>
+                    <div class="mt-1">Ранг <span class="font-semibold text-orange-300">Last</span> — <span class="font-bold coin-gold">+100 монет</span></div>
+                    <div class="text-xs mt-2 text-slate-400">Требования: 6ч playtime + 30k шагов + 1k убийств + 30k блоков.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- COINS PLUGIN DETAILS -->
+    <div class="max-w-screen-2xl mx-auto px-6 pb-10">
+        <div class="wiki-card rounded-3xl p-6">
+            <div class="flex items-center gap-3 mb-4">
+                <i class="fa-solid fa-coins text-3xl text-amber-400"></i>
+                <div>
+                    <div class="font-bold text-2xl">Плагин Coins — Физические монеты</div>
+                    <div class="text-sm text-slate-400">Монеты падают с мобов и руд в виде подсолнухов. Автоматически зачисляются в баланс при подборе.</div>
+                </div>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Mobs -->
+                <div>
+                    <div class="uppercase text-xs font-bold tracking-widest mb-2 text-amber-300">Выпадение с мобов</div>
+                    <ul class="text-sm space-y-1.5">
+                        <li class="flex justify-between"><span>Шанс выпадения</span> <span class="font-semibold">50%</span></li>
+                        <li class="flex justify-between"><span>Сумма за единицу</span> <span class="font-semibold">4–24 монеты</span></li>
+                        <li class="flex justify-between"><span>Эндер-Дракон</span> <span class="font-semibold text-red-300">×20</span></li>
+                        <li class="flex justify-between"><span>Визер</span> <span class="font-semibold text-red-300">×10</span></li>
+                        <li class="flex justify-between text-xs pt-1 text-slate-400"><span>Мобы из спавнеров</span> <span>выключено (кроме перма)</span></li>
+                    </ul>
+                </div>
+                
+                <!-- Blocks -->
+                <div>
+                    <div class="uppercase text-xs font-bold tracking-widest mb-2 text-amber-300">Выпадение с блоков (20% шанс)</div>
+                    <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+                        <div class="flex justify-between"><span>Алмазная руда</span> <span class="font-mono">×2</span></div>
+                        <div class="flex justify-between"><span>Глубинная алмазная</span> <span class="font-mono">×3</span></div>
+                        <div class="flex justify-between"><span>Изумрудная руда</span> <span class="font-mono">×2</span></div>
+                        <div class="flex justify-between"><span>Спавнер</span> <span class="font-mono text-red-300">×5</span></div>
+                        <div class="flex justify-between"><span>Золотая / Железная руда</span> <span class="font-mono">×1</span></div>
+                        <div class="flex justify-between"><span>Кварц, Уголь, Редстоун</span> <span class="font-mono">×1</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TIPS + LOSSES -->
+    <div class="max-w-screen-2xl mx-auto px-6 pb-16 grid md:grid-cols-5 gap-4">
+        <div class="md:col-span-3 wiki-card rounded-3xl p-6">
+            <div class="font-bold mb-3 text-lg flex items-center gap-2">
+                <i class="fa-solid fa-lightbulb text-yellow-400"></i> 
+                <span>Лучшие стратегии 2026</span>
+            </div>
+            <div class="text-sm grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
+                <div>• Комбинируй копание + AFK (копай 25 мин → AFK 30 мин).</div>
+                <div>• Продавай только когда цены максимальные (смотри /seller).</div>
+                <div>• Делай 24ч награду сразу после входа — это 15 000.</div>
+                <div>• Голосование раз в день даёт стабильные 100 монет.</div>
+                <div>• Древний детрит (Ancient Debris) из шахты — самый выгодный предмет (100-110).</div>
+                <div>• Прокачивай лопату — быстрее фарм = больше монет в час.</div>
+            </div>
+        </div>
+        
+        <div class="md:col-span-2 wiki-card border border-red-900/60 rounded-3xl p-6 bg-red-950/20">
+            <div class="font-bold mb-2 flex items-center gap-2 text-red-300">
+                <i class="fa-solid fa-exclamation-triangle"></i> 
+                <span>ГДЕ ТЕРЯЮТСЯ МОНЕТЫ</span>
+            </div>
+            <ul class="text-xs space-y-[3px] text-red-200">
+                <li>• Смерть: 10–30% от баланса (или 5–15 монет)</li>
+                <li>• BearMoney: ежедневная "дань" 5000 (списание)</li>
+                <li>• Налоги ProtectionStones + аренда</li>
+                <li>• Команда /announce стоит 500</li>
+                <li>• Хранение в банке HamsterBank — курс может падать</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-slate-800 py-8 text-xs text-center text-slate-500 bg-slate-900">
+        <div class="max-w-screen-2xl mx-auto px-6">
+            Интерактивный гайд для игроков сервера MineGame • Актуально на февраль 2026<br>
+            Данные собраны из конфигов плагинов: <span class="font-mono">Coins, CMI, PrimeSeller, AzMines, ConditionalEvents, WorldGuard, Citizens</span>
+        </div>
+    </footer>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Tailwind script
+        function initializeTailwind() {
+            document.documentElement.style.setProperty('--accent', '#f4d03f');
+            
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            'mono': ['JetBrains Mono', 'monospace']
+                        }
+                    }
+                }
+            };
+        }
+
+        // Methods data
+        const methods = [
+            {
+                id: 1,
+                title: "Копание + Продажа у Скупщика",
+                category: "farm",
+                icon: "fa-shovel",
+                income: "Высокая",
+                incomeClass: "income-high",
+                estimate: "800–2500 / час",
+                desc: "Основной и самый стабильный способ. Копай блоки в авто-шахте и продавай PrimeSeller.",
+                details: "Иди /warp mine. Копай всё (грязь, песок, гравий, глина, древний детрит). Используй улучшенные лопаты. Продавай через /seller (средняя кнопка мыши или инвентарь).",
+                commands: ["/warp mine", "/seller", "/upgrade"],
+                badge: "ГЛАВНЫЙ"
+            },
+            {
+                id: 2,
+                title: "Награды за время игры (Playtime)",
+                category: "passive",
+                icon: "fa-clock",
+                income: "Пассивная",
+                incomeClass: "income-passive",
+                estimate: "20 + до 500k",
+                desc: "Автоматические выплаты каждые 60 минут + огромные разовые награды за накопленный онлайн.",
+                details: "20 монет каждый час. Дополнительно забирай награды за 1ч / 6ч / 12ч / 24ч / 7д / 30д.",
+                commands: ["/cmi playtime"],
+                badge: "ПАССИВ"
+            },
+            {
+                id: 3,
+                title: "AFK Бассейн",
+                category: "passive",
+                icon: "fa-bed",
+                income: "Пассивная",
+                incomeClass: "income-passive",
+                estimate: "840–2400 / час",
+                desc: "Просто стой в специальном бассейне. Получаешь монеты + случайные ценные предметы.",
+                details: "Регион afkpool. Интервал 5 минут. 70-200 монет + предметы (незеритовое снаряжение, золотые яблоки и т.д.).",
+                commands: ["/warp afkpool"],
+                badge: "ЛУЧШИЙ ПАССИВ"
+            },
+            {
+                id: 4,
+                title: "Дроп монет с мобов (Coins)",
+                category: "pve",
+                icon: "fa-skull",
+                income: "Средняя",
+                incomeClass: "income-medium",
+                estimate: "300–1200 / час",
+                desc: "Убивай враждебных мобов. 50% шанс выпадения физических монет.",
+                details: "Монеты падают в виде подсолнухов. Боссы дают множители (Дракон ×20, Визер ×10). Работает чар Добыча.",
+                commands: [],
+                badge: ""
+            },
+            {
+                id: 5,
+                title: "Добыча руд (Coins BlockDrops)",
+                category: "pve",
+                icon: "fa-gem",
+                income: "Средняя",
+                incomeClass: "income-medium",
+                estimate: "150–700 / час",
+                desc: "При добыче руд с 20% шансом выпадают монеты (множители до ×5).",
+                details: "Алмазная руда ×2, глубинная ×3, спавнер ×5. Работает только без шёлкового касания.",
+                commands: [],
+                badge: ""
+            },
+            {
+                id: 6,
+                title: "PvP — Убийства игроков",
+                category: "risk",
+                icon: "fa-skull-crossbones",
+                income: "Рискованная",
+                incomeClass: "income-risk",
+                estimate: "0–5000+",
+                desc: "При убийстве другого игрока с него выпадают монеты (10–30% баланса).",
+                details: "Высокий риск и высокая награда. Работает защита от альтов (одинаковый IP).",
+                commands: [],
+                badge: "РИСК"
+            },
+            {
+                id: 7,
+                title: "LuckyCrate — Кейсы",
+                category: "special",
+                icon: "fa-gift",
+                income: "Средняя",
+                incomeClass: "income-medium",
+                estimate: "2000–10000 за открытие",
+                desc: "Открывай Lucky Crate и получай крупные суммы монет.",
+                details: "Минимальная награда 2000, максимальная 10000 монет за один кейс.",
+                commands: ["/lucky", "/crate"],
+                badge: ""
+            },
+            {
+                id: 8,
+                title: "Голосование (Votifier)",
+                category: "passive",
+                icon: "fa-vote-yea",
+                income: "Пассивная",
+                incomeClass: "income-passive",
+                estimate: "~100–200 / день",
+                desc: "Голосуй на мониторингах — получай 100 монет за 10 голосов и 1000 за 100 голосов.",
+                details: "Дополнительно 32 алмаза при 100 голосах. Награды автоматические.",
+                commands: ["/vote"],
+                badge: ""
+            },
+            {
+                id: 9,
+                title: "Повышение ранга Last",
+                category: "special",
+                icon: "fa-level-up-alt",
+                income: "Средняя",
+                incomeClass: "income-medium",
+                estimate: "100 (одноразово)",
+                desc: "Достигни ранга Last и получи разовую выплату.",
+                details: "Требования: 6 часов игры, 30 000 блоков, 1000 убийств мобов, 30 000 шагов.",
+                commands: [],
+                badge: ""
+            },
+            {
+                id: 10,
+                title: "Денежный Верблюд (NPC)",
+                category: "special",
+                icon: "fa-drumstick-bite",
+                income: "Низкая",
+                incomeClass: "income-medium",
+                estimate: "1 за клик",
+                desc: "Интерактивный NPC-верблюд у спавна выдаёт 1 монету за взаимодействие.",
+                details: "Левый клик по верблюду → +1 монета и сообщение «Вы получили монетку».",
+                commands: [],
+                badge: "ФАН"
+            },
+            {
+                id: 11,
+                title: "HamsterBank — Крипта",
+                category: "special",
+                icon: "fa-chart-line",
+                income: "Рискованная",
+                incomeClass: "income-risk",
+                estimate: "± (зависит от курса)",
+                desc: "Депозит в HamsterBank. Зарабатывай на колебаниях биржевого курса.",
+                details: "Отдельная валюта ₿. Открывается командой /crypto. Есть бонусный множитель.",
+                commands: ["/crypto", "/hbdeposit", "/hbwithdraw"],
+                badge: "ИНВЕСТИЦИИ"
+            },
+            {
+                id: 12,
+                title: "Airdrops — Воздушные ящики",
+                category: "special",
+                icon: "fa-parachute-box",
+                income: "Средняя",
+                incomeClass: "income-medium",
+                estimate: "Переменный",
+                desc: "Участвуй в открытии аирдропов. Получай ценный лут, который можно продать.",
+                details: "Аирдропы спавнятся автоматически. Внутри дорогие предметы и ресурсы.",
+                commands: [],
+                badge: ""
+            },
+            {
+                id: 13,
+                title: "Продажа игрокам",
+                category: "farm",
+                icon: "fa-handshake",
+                income: "Высокая",
+                incomeClass: "income-high",
+                estimate: "Выше рыночной",
+                desc: "Продавай ресурсы другим игрокам через TradeSystem или свои магазины.",
+                details: "Часто можно продать дороже, чем скупщику. Используй /trade и ShopShelves.",
+                commands: ["/trade", "/shop"],
+                badge: "ПРОДВИНУТЫЙ"
+            }
+        ]
+
+        // Render methods
+        function renderMethods(filteredMethods = methods) {
+            const grid = document.getElementById('methods-grid')
+            grid.innerHTML = ''
+            
+            filteredMethods.forEach(m => {
+                const card = document.createElement('div')
+                card.className = `method-card wiki-card rounded-3xl p-5 cursor-pointer border border-slate-700 hover:border-amber-400/40`
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-x-3">
+                            <div class="w-10 h-10 flex items-center justify-center bg-slate-800 rounded-2xl">
+                                <i class="fa-solid ${m.icon} text-2xl text-amber-300"></i>
+                            </div>
+                            <div>
+                                <div class="font-bold leading-tight pr-1">${m.title}</div>
+                                ${m.badge ? `<div class="text-[10px] mt-0.5 px-2 py-px bg-amber-900/70 w-fit text-amber-300 rounded font-bold tracking-wider">${m.badge}</div>` : ''}
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="stat-badge ${m.incomeClass}">${m.income}</div>
+                            <div class="text-[10px] text-emerald-400 font-semibold mt-1">${m.estimate}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-sm text-slate-300 mt-3 leading-snug line-clamp-2">${m.desc}</div>
+                    
+                    <div class="mt-4 flex items-center justify-between text-xs">
+                        <div class="flex gap-1.5">
+                            ${m.commands.length > 0 ? 
+                                m.commands.slice(0,2).map(cmd => `<span onclick="event.stopImmediatePropagation(); copyToClipboard('${cmd}'); return false;" class="font-mono px-2 py-px bg-slate-800 hover:bg-amber-900 transition-colors rounded-xl cursor-pointer">${cmd}</span>`).join('') 
+                                : '<span class="text-slate-500">Без команд</span>'}
+                        </div>
+                        <div onclick="event.stopImmediatePropagation(); showMethodModal(${m.id})" class="text-amber-400 hover:text-amber-300 font-semibold flex items-center gap-1 text-xs">
+                            ПОДРОБНЕЕ <i class="fa-solid fa-arrow-right ml-0.5"></i>
+                        </div>
+                    </div>
+                `
+                card.onclick = () => showMethodModal(m.id)
+                grid.appendChild(card)
+            })
+        }
+
+        // Filter methods
+        let currentCategory = 'all'
+        
+        function filterMethods() {
+            const term = document.getElementById('search-input').value.toLowerCase().trim()
+            
+            let filtered = methods
+            
+            if (currentCategory !== 'all') {
+                filtered = filtered.filter(m => m.category === currentCategory)
+            }
+            
+            if (term.length > 1) {
+                filtered = filtered.filter(m => 
+                    m.title.toLowerCase().includes(term) || 
+                    m.desc.toLowerCase().includes(term) ||
+                    (m.details && m.details.toLowerCase().includes(term))
+                )
+            }
+            
+            renderMethods(filtered)
+        }
+        
+        function filterByCategory(element, category) {
+            // Deactivate all
+            document.querySelectorAll('#category-filters .nav-pill').forEach(el => el.classList.remove('active'))
+            element.classList.add('active')
+            
+            currentCategory = category
+            
+            const term = document.getElementById('search-input').value.toLowerCase().trim()
+            let filtered = methods
+            
+            if (category !== 'all') {
+                filtered = filtered.filter(m => m.category === category)
+            }
+            
+            if (term.length > 1) {
+                filtered = filtered.filter(m => 
+                    m.title.toLowerCase().includes(term) || 
+                    m.desc.toLowerCase().includes(term)
+                )
+            }
+            
+            renderMethods(filtered)
+        }
+
+        // Seller table data
+        const sellerItems = [
+            { name: "DIRT", min: 1, max: 5, type: "UNLIMITED" },
+            { name: "MUDDY_MANGROVE_ROOTS", min: 3, max: 15, type: "UNLIMITED" },
+            { name: "SAND", min: 2, max: 10, type: "UNLIMITED" },
+            { name: "RED_SAND", min: 3, max: 20, type: "UNLIMITED" },
+            { name: "GRAVEL", min: 2, max: 10, type: "UNLIMITED" },
+            { name: "MUD", min: 2, max: 10, type: "UNLIMITED" },
+            { name: "CLAY_BALL", min: 2, max: 4, type: "UNLIMITED" },
+            { name: "STRING", min: 10, max: 40, type: "UNLIMITED" },
+            { name: "FEATHER", min: 10, max: 40, type: "UNLIMITED" },
+            { name: "FLINT", min: 10, max: 40, type: "UNLIMITED" },
+            { name: "GUNPOWDER", min: 10, max: 40, type: "UNLIMITED" },
+            { name: "COBBLESTONE", min: 2, max: 4, type: "UNLIMITED" },
+            { name: "NAME_TAG", min: 10, max: 40, type: "UNLIMITED" },
+            { name: "COAL", min: 5, max: 50, type: "UNLIMITED" },
+            { name: "RABBIT_HIDE", min: 10, max: 60, type: "UNLIMITED" },
+            { name: "PHANTOM_MEMBRANE", min: 10, max: 40, type: "UNLIMITED" },
+            { name: "BROWN_MUSHROOM", min: 20, max: 80, type: "UNLIMITED" },
+            { name: "IRON_INGOT", min: 20, max: 80, type: "UNLIMITED" },
+            { name: "ARROW", min: 4, max: 5, type: "UNLIMITED" },
+            { name: "QUARTZ", min: 10, max: 40, type: "UNLIMITED" },
+            { name: "COBWEB", min: 90, max: 120, type: "UNLIMITED" },
+            { name: "OBSIDIAN", min: 20, max: 70, type: "LIMITED" },
+            { name: "ANCIENT_DEBRIS", min: 100, max: 110, type: "LIMITED" },
+        ]
+
+        function renderSellerTable(items = sellerItems) {
+            const tbody = document.getElementById('seller-tbody')
+            tbody.innerHTML = ''
+            
+            items.forEach(item => {
+                const row = document.createElement('tr')
+                row.className = 'hover:bg-slate-800/70 text-sm'
+                const isLimited = item.type === "LIMITED"
+                
+                row.innerHTML = `
+                    <td class="font-semibold pl-4">${item.name.replace(/_/g, ' ')}</td>
+                    <td class="text-right font-mono text-emerald-300">${item.min.toLocaleString()}</td>
+                    <td class="text-right font-mono text-emerald-400 font-semibold">${item.max.toLocaleString()}</td>
+                    <td class="text-center">
+                        <span class="px-3 py-px text-xs font-bold rounded-2xl ${isLimited ? 'bg-orange-900 text-orange-300' : 'bg-emerald-900 text-emerald-300'}">${item.type}</span>
+                    </td>
+                `
+                tbody.appendChild(row)
+            })
+        }
+
+        let sellerSortDir = 1
+        
+        function sortSellerTable(col) {
+            const sorted = [...sellerItems].sort((a, b) => {
+                if (col === 0) return a.name.localeCompare(b.name) * sellerSortDir
+                if (col === 1) return (a.min - b.min) * sellerSortDir
+                if (col === 2) return (a.max - b.max) * sellerSortDir
+                if (col === 3) return a.type.localeCompare(b.type) * sellerSortDir
+                return 0
+            })
+            
+            sellerSortDir *= -1
+            renderSellerTable(sorted)
+        }
+
+        // Modal
+        function showMethodModal(id) {
+            const m = methods.find(x => x.id === id)
+            if (!m) return
+            
+            const modal = document.createElement('div')
+            modal.className = `fixed inset-0 bg-black/70 flex items-end md:items-center justify-center z-[100]`
+            modal.innerHTML = `
+                <div onclick="event.target.remove()" class="absolute inset-0"></div>
+                <div onclick="event.stopImmediatePropagation()" class="relative w-full md:w-[620px] bg-slate-900 border border-slate-700 md:rounded-3xl md:m-4 rounded-t-3xl p-6 max-h-[92vh] overflow-auto">
+                    <div class="flex justify-between">
+                        <div class="flex items-center gap-x-3">
+                            <div class="w-12 h-12 bg-slate-800 rounded-2xl flex items-center justify-center">
+                                <i class="fa-solid ${m.icon} text-4xl text-amber-300"></i>
+                            </div>
+                            <div>
+                                <div class="font-black text-2xl">${m.title}</div>
+                                <div class="flex gap-2 mt-1">
+                                    <span class="stat-badge ${m.incomeClass}">${m.income}</span>
+                                    <span class="text-xs px-3 flex items-center bg-emerald-900 text-emerald-300 rounded-2xl font-medium">${m.estimate}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="this.closest('.fixed').remove()" class="text-2xl leading-none text-slate-400 hover:text-white">&times;</button>
+                    </div>
+                    
+                    <div class="my-5 text-[15px] leading-relaxed">${m.details}</div>
+                    
+                    ${m.commands && m.commands.length ? `
+                    <div class="mb-5">
+                        <div class="uppercase text-xs font-bold tracking-wider mb-1.5 text-amber-300">ПОЛЕЗНЫЕ КОМАНДЫ</div>
+                        <div class="flex flex-wrap gap-2">
+                            ${m.commands.map(cmd => `
+                                <div onclick="copyToClipboard('${cmd}'); this.closest('.fixed').remove()" class="cursor-pointer font-mono px-4 py-1 bg-slate-800 hover:bg-amber-400 hover:text-black transition-colors rounded-2xl text-sm">${cmd}</div>
+                            `).join('')}
+                        </div>
+                    </div>` : ''}
+                    
+                    <div class="pt-4 border-t border-slate-700 flex gap-2">
+                        <button onclick="this.closest('.fixed').remove()" class="flex-1 py-3 bg-slate-800 hover:bg-slate-700 font-semibold rounded-2xl">ЗАКРЫТЬ</button>
+                    </div>
+                </div>
+            `
+            document.body.appendChild(modal)
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const toast = document.createElement('div')
+                toast.className = `fixed bottom-5 left-1/2 -translate-x-1/2 bg-emerald-600 text-white px-5 py-2 rounded-3xl text-sm flex items-center gap-2 shadow-2xl z-[200]`
+                toast.innerHTML = `<i class="fa-solid fa-check"></i> <span>Скопировано: <b>${text}</b></span>`
+                document.body.appendChild(toast)
+                
+                setTimeout(() => {
+                    toast.style.transition = 'all 0.2s'
+                    toast.style.opacity = '0'
+                    setTimeout(() => toast.remove(), 200)
+                }, 1700)
+            }).catch(() => {
+                // fallback
+                prompt("Скопируй команду:", text)
+            })
+        }
+
+        // Initialize seller table
+        function initSellerTable() {
+            renderSellerTable()
+            
+            // Live filter for seller table
+            const search = document.getElementById('search-input')
+            search.addEventListener('input', () => {
+                // Only filter seller if user is focused on it? No — we keep global search only for methods
+            })
+        }
+
+        // Keyboard shortcuts
+        function initKeyboard() {
+            document.addEventListener('keydown', function(e) {
+                if (e.key === "/" && document.activeElement.tagName === "BODY") {
+                    e.preventDefault()
+                    document.getElementById('search-input').focus()
+                }
+                if (e.metaKey && e.key === "k") {
+                    e.preventDefault()
+                    document.getElementById('search-input').focus()
+                }
+            })
+            
+            // Easter egg - konami or just click logo
+            let clicks = 0
+            const logo = document.querySelector('header .fa-coins')
+            if (logo) {
+                logo.addEventListener('click', () => {
+                    clicks++
+                    if (clicks === 5) {
+                        clicks = 0
+                        const orig = logo.style.transform
+                        logo.style.transition = 'transform 1.5s'
+                        logo.style.transform = 'rotate(720deg) scale(1.6)'
+                        setTimeout(() => {
+                            logo.style.transform = orig || ''
+                        }, 1600)
+                    }
+                })
+            }
+        }
+
+        // Boot everything
+        function bootWiki() {
+            initializeTailwind()
+            
+            // Render all methods
+            renderMethods()
+            
+            // Seller table
+            initSellerTable()
+            
+            // Keyboard
+            initKeyboard()
+            
+            // Initial search hint
+            const search = document.getElementById('search-input')
+            search.placeholder = "Поиск... (нажми / для фокуса)"
+            
+            // Random tip every 45 seconds in console only
+            console.log('%c[MineGame Wiki] Интерактивная вики по монетам загружена. Все данные взяты из реальных конфигов сервера.', 'color:#64748b')
+            
+            // Optional: show one random method highlighted on first load (subtle)
+            setTimeout(() => {
+                const cards = document.querySelectorAll('#methods-grid .method-card')
+                if (cards.length > 0) {
+                    // do nothing, just ready
+                }
+            }, 2200)
+        }
+
+        // Auto boot
+        window.onload = bootWiki
+    </script>
+</body>
+</html>
