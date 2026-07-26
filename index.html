@@ -1,1 +1,306 @@
-<head><title>GDTrainer - чит на Geometry Dash</title><h1><center>Скачать GDTrainer:<br><br>1)<a href=http://t.me/GDTrainer_builds> C Telegram</a><br>2)<a href=cloudzore.html> C CloudZore</a><br><br><img src=trainer.webp><br><iframe width=786 height=402 src=https://www.youtube.com/embed/82-X0s-xP0g allowfullscreen></iframe><br><br>Скачать GDTrainer:<br><br>1)<a href=http://t.me/GDTrainer_builds> C Telegram</a><br>2)<a href=cloudzore.html> C CloudZore</a><hr><a href=http://www.youtube.com/channel/UCM7rc_S15XTWKXJzKNg5klQ>Наш YouTube</a> | <a href=http://discord.gg/5zEszDMCRQ>Наш Discord</a> | <a href=http://t.me/GDTrainer>Наш Telegram</a>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>Скачать sw.mp4</title>
+<style>
+  :root{
+    --bg:#0f1115; --card:#171a21; --line:#262b35;
+    --fg:#e8eaf0; --muted:#9aa3b2; --accent:#4f8cff; --ok:#2ecc71; --err:#ff5f56;
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#f4f5f8; --card:#fff; --line:#e2e5ec; --fg:#1a1d24; --muted:#5e6675; }
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+    padding:24px; background:var(--bg); color:var(--fg);
+    font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  .card{
+    width:100%; max-width:520px; background:var(--card); border:1px solid var(--line);
+    border-radius:16px; padding:28px;
+  }
+  h1{margin:0 0 4px; font-size:20px}
+  .sub{color:var(--muted); font-size:13px; margin-bottom:22px}
+  button{
+    width:100%; padding:13px 18px; font:600 15px/1 inherit; color:#fff;
+    background:var(--accent); border:0; border-radius:10px; cursor:pointer;
+  }
+  button:hover:not(:disabled){filter:brightness(1.1)}
+  button:disabled{opacity:.5; cursor:default}
+  button.ghost{background:transparent; color:var(--muted); border:1px solid var(--line); margin-top:10px}
+  .bar{height:8px; background:var(--line); border-radius:99px; overflow:hidden; margin:20px 0 10px; display:none}
+  .bar.on{display:block}
+  .fill{height:100%; width:0; background:var(--accent); border-radius:99px; transition:width .2s}
+  .fill.done{background:var(--ok)}
+  .fill.err{background:var(--err)}
+  .stats{display:flex; justify-content:space-between; font-size:13px; color:var(--muted); font-variant-numeric:tabular-nums}
+  .msg{margin-top:16px; font-size:13px; color:var(--muted)}
+  .msg.ok{color:var(--ok)}
+  .msg.err{color:var(--err)}
+  details{margin-top:22px; border-top:1px solid var(--line); padding-top:16px; font-size:13px; color:var(--muted)}
+  summary{cursor:pointer; user-select:none}
+  ol{padding-left:20px; margin:12px 0}
+  a{color:var(--accent)}
+  code{
+    display:block; background:var(--bg); border:1px solid var(--line); border-radius:8px;
+    padding:8px 10px; margin:6px 0 12px; font-size:12px; overflow-x:auto; white-space:pre;
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>sw.mp4</h1>
+  <div class="sub" id="sub"></div>
+
+  <button id="go">Скачать</button>
+  <button id="cancel" class="ghost" hidden>Отмена</button>
+
+  <div class="bar" id="bar"><div class="fill" id="fill"></div></div>
+  <div class="stats"><span id="left"></span><span id="right"></span></div>
+  <div class="msg" id="msg"></div>
+
+  <details>
+    <summary>Не сработало? Собрать вручную</summary>
+    <ol>
+      <li>Скачайте все части в одну папку: <span id="links"></span></li>
+      <li>Склейте их одной командой:</li>
+    </ol>
+    <div>Windows (cmd):</div>
+    <code id="cmdWin"></code>
+    <div>macOS / Linux:</div>
+    <code id="cmdNix"></code>
+  </details>
+</div>
+
+<script>
+const MANIFEST = {
+  name: "sw.mp4",
+  type: "video/mp4",
+  size: 163099656,
+  parts: [
+    { url: "parts/sw-000.bin", size: 20000000, sha256: "cec35ca3dcb7dca910a4213e7c050364739570e2b1987cedf9f106961a61ab19" },
+    { url: "parts/sw-001.bin", size: 20000000, sha256: "670d561b75fdbd6b45ec863f06ae3616cd5996ab843c2fd95ab4d1272cbc6fb1" },
+    { url: "parts/sw-002.bin", size: 20000000, sha256: "0f52425bf82c9c19656a7bb54f7f592c1c516f81700e77a1e6505f618f28f072" },
+    { url: "parts/sw-003.bin", size: 20000000, sha256: "93c4e1f88ce8a5882bcf213f790592466b258e465de36730250d325441c5a1ce" },
+    { url: "parts/sw-004.bin", size: 20000000, sha256: "130786a384390ef65a9ee5a4307e36a83e1866eada62d5368592068f29e5c9e5" },
+    { url: "parts/sw-005.bin", size: 20000000, sha256: "621abe35ba9f3dfbea2590d91bdc5bca2473f0d8baf390174729c93276ebf6c8" },
+    { url: "parts/sw-006.bin", size: 20000000, sha256: "d91ca5a3d732daea1648b61dd46ae3de4090401db48553c2ae9799e614ec04d2" },
+    { url: "parts/sw-007.bin", size: 20000000, sha256: "e79a07907cab23cad99e7d10f8d153adf56fa8e4126e49e6b7733ad776ac23e2" },
+    { url: "parts/sw-008.bin", size: 3099656,  sha256: "bc393cb244f6f37df887c89cb5217032caca5b8b4b7b826a9df222a3099d5cfa" }
+  ]
+};
+
+const LOOKAHEAD = 3;   // сколько частей качаем на опережение (ограничивает расход памяти)
+const RETRIES   = 4;   // попыток на часть
+
+const $ = id => document.getElementById(id);
+const els = { go:$('go'), cancel:$('cancel'), bar:$('bar'), fill:$('fill'),
+              left:$('left'), right:$('right'), msg:$('msg'), sub:$('sub') };
+
+/* ---------- форматирование ---------- */
+const mb = n => (n / 1048576).toFixed(1) + ' МБ';
+const fmtSize = n => n >= 1073741824 ? (n / 1073741824).toFixed(2) + ' ГБ' : mb(n);
+const fmtTime = s => {
+  if (!isFinite(s) || s < 0) return '—';
+  s = Math.round(s);
+  const m = Math.floor(s / 60);
+  return m ? `${m} мин ${String(s % 60).padStart(2,'0')} с` : `${s} с`;
+};
+
+els.sub.textContent = `${fmtSize(MANIFEST.size)} · ${MANIFEST.parts.length} частей · собирается прямо в браузере`;
+
+/* ---------- ручной вариант ---------- */
+$('links').innerHTML = MANIFEST.parts
+  .map((p, i) => `<a href="${p.url}" download>${i}</a>`).join(' · ');
+$('cmdWin').textContent =
+  'copy /b ' + MANIFEST.parts.map(p => p.url.split('/').pop()).join('+') + ' ' + MANIFEST.name;
+$('cmdNix').textContent =
+  'cat ' + MANIFEST.parts.map(p => p.url.split('/').pop()).join(' ') + ' > ' + MANIFEST.name;
+
+/* ---------- утилиты ---------- */
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+function deferred() {
+  let resolve, reject;
+  const promise = new Promise((res, rej) => { resolve = res; reject = rej; });
+  return { promise, resolve, reject };
+}
+
+async function sha256hex(bytes) {
+  if (!(window.crypto && crypto.subtle)) return null;   // нужен https или localhost
+  const digest = await crypto.subtle.digest('SHA-256', bytes);
+  return [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+/* ---------- состояние прогресса ---------- */
+let received = 0, startedAt = 0, aborter = null;
+
+function paint() {
+  const pct = Math.min(100, received / MANIFEST.size * 100);
+  els.fill.style.width = pct.toFixed(2) + '%';
+  const elapsed = (performance.now() - startedAt) / 1000;
+  const speed = elapsed > 0.4 ? received / elapsed : 0;
+  els.left.textContent = `${mb(received)} из ${fmtSize(MANIFEST.size)} · ${pct.toFixed(0)}%`;
+  els.right.textContent = speed
+    ? `${(speed / 1048576).toFixed(1)} МБ/с · осталось ${fmtTime((MANIFEST.size - received) / speed)}`
+    : '';
+}
+
+function say(text, cls = '') { els.msg.textContent = text; els.msg.className = 'msg ' + cls; }
+
+/* ---------- загрузка одной части ---------- */
+async function fetchPart(part, signal) {
+  const res = await fetch(part.url, { signal });
+  if (!res.ok) throw new Error(`${part.url}: HTTP ${res.status}`);
+
+  let bytes;
+  if (res.body && res.body.getReader) {
+    const reader = res.body.getReader();
+    const buf = new Uint8Array(part.size);
+    let offset = 0;
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (offset + value.length > buf.length) throw new Error(`${part.url}: размер больше ожидаемого`);
+      buf.set(value, offset);
+      offset += value.length;
+      received += value.length;
+      paint();
+    }
+    if (offset !== part.size) throw new Error(`${part.url}: получено ${offset} из ${part.size} байт`);
+    bytes = buf;
+  } else {
+    bytes = new Uint8Array(await res.arrayBuffer());
+    received += bytes.length;
+    paint();
+  }
+
+  const hash = await sha256hex(bytes);
+  if (hash && hash !== part.sha256) throw new Error(`${part.url}: контрольная сумма не совпала`);
+  return bytes;
+}
+
+async function fetchPartRetrying(part, signal) {
+  for (let attempt = 1; ; attempt++) {
+    const before = received;
+    try {
+      return await fetchPart(part, signal);
+    } catch (e) {
+      received = before;            // откатываем прогресс неудачной попытки
+      paint();
+      if (signal.aborted) throw new DOMException('Отменено', 'AbortError');
+      if (attempt >= RETRIES) throw e;
+      say(`${e.message} — повтор ${attempt}/${RETRIES - 1}…`);
+      await sleep(700 * attempt);
+    }
+  }
+}
+
+/* ---------- сборка ---------- */
+async function run() {
+  // showSaveFilePicker обязан вызываться до любого await, пока жив «жест пользователя»
+  let writable = null;
+  if (window.showSaveFilePicker) {
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: MANIFEST.name,
+        types: [{ description: 'Видео MP4', accept: { 'video/mp4': ['.mp4'] } }]
+      });
+      writable = await handle.createWritable();
+    } catch (e) {
+      if (e.name === 'AbortError') return;      // пользователь закрыл диалог
+      writable = null;                          // не поддержано — соберём в память
+    }
+  }
+
+  aborter = new AbortController();
+  const { signal } = aborter;
+  received = 0; startedAt = performance.now();
+  els.go.disabled = true;
+  els.go.textContent = writable ? 'Скачиваем на диск…' : 'Скачиваем…';
+  els.cancel.hidden = false;
+  els.bar.classList.add('on');
+  els.fill.className = 'fill';
+  say(writable
+    ? 'Части пишутся в файл по мере загрузки.'
+    : 'Части собираются в памяти, файл сохранится в конце.');
+  paint();
+
+  const parts = MANIFEST.parts;
+  const slots = parts.map(deferred);
+  slots.forEach(s => s.promise.catch(() => {}));   // без необработанных reject'ов
+  let launched = 0;
+  const pump = cursor => {
+    while (launched < parts.length && launched < cursor + LOOKAHEAD) {
+      const i = launched++;
+      fetchPartRetrying(parts[i], signal).then(slots[i].resolve, slots[i].reject);
+    }
+  };
+
+  const collected = [];
+  try {
+    for (let i = 0; i < parts.length; i++) {
+      pump(i);
+      const bytes = await slots[i].promise;
+      if (writable) await writable.write(bytes);
+      else collected.push(new Blob([bytes], { type: MANIFEST.type }));
+    }
+
+    if (writable) {
+      await writable.close();
+      writable = null;
+      finish('Готово — файл сохранён.');
+    } else {
+      const blob = new Blob(collected, { type: MANIFEST.type });
+      collected.length = 0;
+      if (blob.size !== MANIFEST.size) throw new Error(`собрано ${blob.size} байт вместо ${MANIFEST.size}`);
+      const url = URL.createObjectURL(blob);
+      const a = Object.assign(document.createElement('a'), { href: url, download: MANIFEST.name });
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 120000);
+      finish('Готово — файл передан браузеру. Если сохранение не началось, проверьте блокировку загрузок.');
+    }
+  } catch (e) {
+    aborter.abort();
+    if (writable) { try { await writable.abort(); } catch (_) {} }
+    collected.length = 0;
+    if (e.name === 'AbortError') {
+      els.fill.className = 'fill';
+      say('Отменено.');
+    } else {
+      els.fill.className = 'fill err';
+      say('Ошибка: ' + e.message + ' Попробуйте ещё раз или соберите файл вручную (ниже).', 'err');
+    }
+    reset();
+  }
+}
+
+function finish(text) {
+  els.fill.style.width = '100%';
+  els.fill.className = 'fill done';
+  els.right.textContent = `за ${fmtTime((performance.now() - startedAt) / 1000)}`;
+  say(text, 'ok');
+  reset();
+}
+
+function reset() {
+  els.go.disabled = false;
+  els.go.textContent = 'Скачать';
+  els.cancel.hidden = true;
+  aborter = null;
+}
+
+els.go.addEventListener('click', run);
+els.cancel.addEventListener('click', () => aborter && aborter.abort());
+window.addEventListener('beforeunload', e => {
+  if (aborter) { e.preventDefault(); e.returnValue = ''; }
+});
+</script>
+</body>
+</html>
