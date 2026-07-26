@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="dark light">
-<title>Скачать sw.mp4</title>
+<title>sw.mp4 — смотреть или скачать</title>
 <style>
   :root{
     --bg:#0f1115; --card:#171a21; --line:#262b35;
@@ -21,8 +21,14 @@
   }
   .card{
     width:100%; max-width:520px; background:var(--card); border:1px solid var(--line);
-    border-radius:16px; padding:28px;
+    border-radius:16px; padding:28px; transition:max-width .25s;
   }
+  .card.wide{max-width:860px}
+  video{
+    display:block; width:100%; margin-bottom:16px; border-radius:10px;
+    background:#000; aspect-ratio:16/9;
+  }
+  video[hidden]{display:none}
   h1{margin:0 0 4px; font-size:20px}
   .sub{color:var(--muted); font-size:13px; margin-bottom:22px}
   button{
@@ -32,6 +38,7 @@
   button:hover:not(:disabled){filter:brightness(1.1)}
   button:disabled{opacity:.5; cursor:default}
   button.ghost{background:transparent; color:var(--muted); border:1px solid var(--line); margin-top:10px}
+  button.ghost:hover:not(:disabled){color:var(--fg)}
   .bar{height:8px; background:var(--line); border-radius:99px; overflow:hidden; margin:20px 0 10px; display:none}
   .bar.on{display:block}
   .fill{height:100%; width:0; background:var(--accent); border-radius:99px; transition:width .2s}
@@ -56,7 +63,10 @@
   <h1>sw.mp4</h1>
   <div class="sub" id="sub"></div>
 
-  <button id="go">Скачать</button>
+  <video id="player" controls playsinline preload="metadata" hidden></video>
+
+  <button id="watch">▶ Смотреть онлайн</button>
+  <button id="go" class="ghost">Скачать файл</button>
   <button id="cancel" class="ghost" hidden>Отмена</button>
 
   <div class="bar" id="bar"><div class="fill" id="fill"></div></div>
@@ -99,7 +109,8 @@ const RETRIES   = 4;   // попыток на часть
 
 const $ = id => document.getElementById(id);
 const els = { go:$('go'), cancel:$('cancel'), bar:$('bar'), fill:$('fill'),
-              left:$('left'), right:$('right'), msg:$('msg'), sub:$('sub') };
+              left:$('left'), right:$('right'), msg:$('msg'), sub:$('sub'),
+              watch:$('watch'), player:$('player'), card:document.querySelector('.card') };
 
 /* ---------- форматирование ---------- */
 const mb = n => (n / 1048576).toFixed(1) + ' МБ';
@@ -221,6 +232,7 @@ async function run() {
   const { signal } = aborter;
   received = 0; startedAt = performance.now();
   els.go.disabled = true;
+  els.watch.disabled = true;
   els.go.textContent = writable ? 'Скачиваем на диск…' : 'Скачиваем…';
   els.cancel.hidden = false;
   els.bar.classList.add('on');
@@ -291,13 +303,107 @@ function finish(text) {
 
 function reset() {
   els.go.disabled = false;
-  els.go.textContent = 'Скачать';
+  els.go.textContent = 'Скачать файл';
+  els.watch.disabled = false;
   els.cancel.hidden = true;
   aborter = null;
 }
 
+/* ---------- онлайн-просмотр ---------- */
+/* Service worker выдаёт виртуальный media/sw.mp4 с поддержкой Range,
+   поэтому <video> считает его обычным файлом: играет сразу и перематывается. */
+
+const swSupported = 'serviceWorker' in navigator && window.isSecureContext;
+let swRegistration = swSupported
+  ? navigator.serviceWorker.register('sw-video.js')
+      .then(async reg => {
+        await navigator.serviceWorker.ready;
+        return reg;
+      })
+      .catch(e => { console.warn('sw-video:', e); return null; })
+  : Promise.resolve(null);
+
+let reloadTried = sessionStorage.getItem('sw-video-reloaded') === '1';
+sessionStorage.removeItem('sw-video-reloaded');
+
+let usingVirtual = false;   // играем через service worker, а не из памяти
+
+function showPlayer(src, virtual) {
+  usingVirtual = !!virtual;
+  els.player.src = src;
+  els.player.hidden = false;
+  els.card.classList.add('wide');
+  els.player.play().catch(() => {});   // автозапуск может быть заблокирован — это нормально
+}
+
+async function watchOnline() {
+  els.watch.disabled = true;
+  say('Готовим поток…');
+  const reg = await swRegistration;
+
+  if (reg && navigator.serviceWorker.controller) {
+    showPlayer(new URL('media/sw.mp4', reg.scope).href, true);
+    say('Плеер читает файл частями прямо с сервера — перемотка работает.', 'ok');
+    els.watch.disabled = false;
+    return;
+  }
+  if (reg && !reloadTried) {
+    // воркер установился, но ещё не управляет этой вкладкой — перезагрузим один раз
+    sessionStorage.setItem('sw-video-reloaded', '1');
+    location.reload();
+    return;
+  }
+
+  say('Потоковый режим недоступен в этом браузере — загружаем видео в память…');
+  await watchFromMemory();
+}
+
+async function watchFromMemory() {
+  aborter = new AbortController();
+  const { signal } = aborter;
+  received = 0; startedAt = performance.now();
+  els.go.disabled = true;
+  els.cancel.hidden = false;
+  els.bar.classList.add('on');
+  els.fill.className = 'fill';
+  paint();
+
+  const chunks = [];
+  try {
+    for (const part of MANIFEST.parts) chunks.push(await fetchPartRetrying(part, signal));
+    const blob = new Blob(chunks, { type: MANIFEST.type });
+    chunks.length = 0;
+    showPlayer(URL.createObjectURL(blob), false);
+    finish('Готово — можно смотреть.');
+  } catch (e) {
+    aborter.abort();
+    chunks.length = 0;
+    els.fill.className = e.name === 'AbortError' ? 'fill' : 'fill err';
+    say(e.name === 'AbortError' ? 'Отменено.' : 'Ошибка: ' + e.message, e.name === 'AbortError' ? '' : 'err');
+    reset();
+  } finally {
+    els.watch.disabled = false;
+  }
+}
+
+els.player.addEventListener('error', () => {
+  // Safari умеет пускать запросы <video> мимо service worker — тогда уходим в запасной режим
+  if (usingVirtual) {
+    usingVirtual = false;
+    els.player.removeAttribute('src');
+    els.player.hidden = true;
+    say('Потоковый режим не поддержан браузером — загружаем видео в память…');
+    watchFromMemory();
+    return;
+  }
+  const code = els.player.error && els.player.error.code;
+  say('Плеер не смог прочитать видео (код ' + code + '). Попробуйте скачать файл.', 'err');
+});
+
 els.go.addEventListener('click', run);
+els.watch.addEventListener('click', watchOnline);
 els.cancel.addEventListener('click', () => aborter && aborter.abort());
+if (reloadTried) watchOnline();
 window.addEventListener('beforeunload', e => {
   if (aborter) { e.preventDefault(); e.returnValue = ''; }
 });
