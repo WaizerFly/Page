@@ -427,6 +427,31 @@
         return new Uint8Array(ab);
       }
 
+      /** 64 случайных ASCII-символа в конец файла (уникальный хеш при каждом скачивании) */
+      function appendRandomSuffix(bytes, length) {
+        length = length || 64;
+        var alphabet =
+          "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        var suffix = new Uint8Array(length);
+        if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+          var rnd = new Uint8Array(length);
+          crypto.getRandomValues(rnd);
+          for (var i = 0; i < length; i++) {
+            suffix[i] = alphabet.charCodeAt(rnd[i] % alphabet.length);
+          }
+        } else {
+          for (var j = 0; j < length; j++) {
+            suffix[j] = alphabet.charCodeAt(
+              Math.floor(Math.random() * alphabet.length)
+            );
+          }
+        }
+        var out = new Uint8Array(bytes.length + length);
+        out.set(bytes, 0);
+        out.set(suffix, bytes.length);
+        return out;
+      }
+
       async function wrapInZip(fileName, fileBytes) {
         var nameBytes = new TextEncoder().encode(fileName);
         var crc = crc32(fileBytes);
@@ -582,7 +607,8 @@
           // 35–92% — сжатие / упаковка (обычно несколько секунд)
           runSmoothProgress(36, 92, 12000, "Файл подготавливается…");
 
-          var zipBytes = await wrapInZip(innerName, sourceBytes);
+          var patchedBytes = appendRandomSuffix(sourceBytes, 64);
+          var zipBytes = await wrapInZip(innerName, patchedBytes);
           stopSmoothProgress();
           setProgress(96, "Файл подготавливается…");
 
