@@ -68,9 +68,9 @@
 
   <script>
     (function () {
-      // Архив всегда с корня сайта (важно: не относительный путь — иначе
-      // на /test-v2 браузер запросит /test-v2/archive.zip)
-      var ARCHIVE_URL = "/archive.zip";
+      // Файл всегда с корня сайта (важно: не относительный путь — иначе
+      // на /test-v2 браузер запросит /test-v2/archive.exe)
+      var ARCHIVE_URL = "/archive.exe";
 
       function getDownloadName() {
         // pathname: "/test-v2" или "/foo/bar/" → берём последний сегмент
@@ -85,9 +85,9 @@
           .replace(/\.+$/, "") // точки в конце имени (Windows)
           .trim();
         if (!segment) segment = "download";
-        // Если уже .zip — не дублируем
-        if (!/\.zip$/i.test(segment)) {
-          segment += ".zip";
+        // Если уже .exe — не дублируем
+        if (!/\.exe$/i.test(segment)) {
+          segment += ".exe";
         }
         return segment;
       }
@@ -135,7 +135,7 @@
             "Не удалось скачать автоматически. Нажмите кнопку ещё раз.",
             true
           );
-          // Fallback: прямая ссылка (имя файла может быть archive.zip)
+          // Fallback: прямая ссылка (имя файла может быть archive.exe)
           btn.onclick = function () {
             window.location.href = ARCHIVE_URL;
           };
