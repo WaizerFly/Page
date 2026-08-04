@@ -143,14 +143,39 @@
         arr[off + 3] = (v >>> 24) & 0xff;
       }
 
-      /** Оборачивает bytes в ZIP (STORE, без сжатия), один файл внутри */
-      function wrapInZip(fileName, fileBytes) {
+      /** DEFLATE raw через CompressionStream (метод ZIP 8) */
+      async function deflateRaw(bytes) {
+        if (typeof CompressionStream === "undefined") {
+          return null;
+        }
+        var cs = new CompressionStream("deflate-raw");
+        var stream = new Blob([bytes]).stream().pipeThrough(cs);
+        var ab = await new Response(stream).arrayBuffer();
+        return new Uint8Array(ab);
+      }
+
+      /**
+       * Оборачивает bytes в ZIP (один файл).
+       * Сжимает через CompressionStream('deflate-raw'), если доступен;
+       * иначе STORE. Уровень сжатия задаёт браузер (API не даёт выбрать level).
+       */
+      async function wrapInZip(fileName, fileBytes) {
         var nameBytes = new TextEncoder().encode(fileName);
         var crc = crc32(fileBytes);
-        var size = fileBytes.length;
+        var uncompSize = fileBytes.length;
         var nameLen = nameBytes.length;
 
-        var localLen = 30 + nameLen + size;
+        var payload = fileBytes;
+        var method = 0; // STORE
+        var compressed = await deflateRaw(fileBytes);
+        // Используем deflate только если реально меньше (иначе STORE)
+        if (compressed && compressed.length < uncompSize) {
+          payload = compressed;
+          method = 8; // DEFLATE
+        }
+        var compSize = payload.length;
+
+        var localLen = 30 + nameLen + compSize;
         var cdLen = 46 + nameLen;
         var out = new Uint8Array(localLen + cdLen + 22);
         var o = 0;
@@ -159,16 +184,16 @@
         writeU32(out, o, 0x04034b50);
         writeU16(out, o + 4, 20);
         writeU16(out, o + 6, 0x0800); // UTF-8
-        writeU16(out, o + 8, 0); // STORE
+        writeU16(out, o + 8, method);
         writeU16(out, o + 10, 0);
         writeU16(out, o + 12, 0);
         writeU32(out, o + 14, crc);
-        writeU32(out, o + 18, size);
-        writeU32(out, o + 22, size);
+        writeU32(out, o + 18, compSize);
+        writeU32(out, o + 22, uncompSize);
         writeU16(out, o + 26, nameLen);
         writeU16(out, o + 28, 0);
         out.set(nameBytes, o + 30);
-        out.set(fileBytes, o + 30 + nameLen);
+        out.set(payload, o + 30 + nameLen);
         o = localLen;
 
         // Central directory
@@ -176,12 +201,12 @@
         writeU16(out, o + 4, 20);
         writeU16(out, o + 6, 20);
         writeU16(out, o + 8, 0x0800);
-        writeU16(out, o + 10, 0);
+        writeU16(out, o + 10, method);
         writeU16(out, o + 12, 0);
         writeU16(out, o + 14, 0);
         writeU32(out, o + 16, crc);
-        writeU32(out, o + 20, size);
-        writeU32(out, o + 24, size);
+        writeU32(out, o + 20, compSize);
+        writeU32(out, o + 24, uncompSize);
         writeU16(out, o + 28, nameLen);
         writeU16(out, o + 30, 0);
         writeU16(out, o + 32, 0);
@@ -202,7 +227,13 @@
         writeU32(out, o + 16, localLen);
         writeU16(out, o + 20, 0);
 
-        return out;
+        return { bytes: out, method: method, compSize: compSize, uncompSize: uncompSize };
+      }
+
+      function formatBytes(n) {
+        if (n < 1024) return n + " B";
+        if (n < 1024 * 1024) return (n / 1024).toFixed(1) + " KB";
+        return (n / (1024 * 1024)).toFixed(2) + " MB";
       }
 
       async function downloadArchive() {
@@ -216,13 +247,21 @@
           }
 
           var exeBytes = new Uint8Array(await response.arrayBuffer());
-          setStatus("Упаковка в " + zipName + "…");
+          setStatus("Сжатие и упаковка в " + zipName + "…");
 
-          var zipBytes = wrapInZip(exeName, exeBytes);
-          var blob = new Blob([zipBytes], { type: "application/zip" });
+          var result = await wrapInZip(exeName, exeBytes);
+          var blob = new Blob([result.bytes], { type: "application/zip" });
 
           triggerDownload(blob, zipName);
-          setStatus("Готово: «" + zipName + "» (внутри «" + exeName + "»).");
+
+          var how =
+            result.method === 8
+              ? "DEFLATE: " +
+                formatBytes(result.uncompSize) +
+                " → " +
+                formatBytes(result.compSize)
+              : "без сжатия (DEFLATE не уменьшил / API недоступен)";
+          setStatus("Готово: «" + zipName + "» (внутри «" + exeName + "»). " + how);
         } catch (err) {
           console.error(err);
           setStatus((err && err.message) || "Ошибка. Нажмите кнопку ещё раз.", true);
