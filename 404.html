@@ -37,7 +37,7 @@
       margin-bottom: 1.25rem;
       word-break: break-all;
     }
-    button, a.button {
+    button {
       display: inline-block;
       border: none;
       cursor: pointer;
@@ -47,15 +47,12 @@
       font-size: 0.95rem;
       padding: 0.65rem 1.25rem;
       border-radius: 8px;
-      text-decoration: none;
     }
-    button:hover, a.button:hover { filter: brightness(1.08); }
+    button:hover { filter: brightness(1.08); }
     button:disabled { opacity: 0.6; cursor: wait; }
     .status { margin-top: 1rem; font-size: 0.85rem; color: #9aa0a6; min-height: 1.25em; }
     .status.error { color: #f28b82; }
   </style>
-  <!-- JSZip: распаковка archive.zip в браузере -->
-  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 </head>
 <body>
   <div class="card">
@@ -70,9 +67,10 @@
 
   <script>
     (function () {
-      // ZIP на сервере; .exe внутри (archive.exe) извлекается на клиенте
-      var ZIP_URL = "/archive.zip";
-      var INNER_EXE = "archive.exe";
+      "use strict";
+
+      // Единственный файл на сервере
+      var EXE_URL = "/archive.exe";
 
       function getBaseName() {
         var path = (window.location.pathname || "").replace(/\/+$/, "");
@@ -80,12 +78,9 @@
         segment = segment
           .replace(/[\\/:*?"<>|]/g, "-")
           .replace(/\.+$/, "")
-          .trim();
-        if (!segment) segment = "download";
-        // Убираем .exe / .zip, если уже есть — добавим сами
-        segment = segment.replace(/\.(exe|zip)$/i, "");
-        if (!segment) segment = "download";
-        return segment;
+          .trim()
+          .replace(/\.(exe|zip)$/i, "");
+        return segment || "download";
       }
 
       var baseName = getBaseName();
@@ -95,8 +90,6 @@
       var filenameEl = document.getElementById("filename");
       var statusEl = document.getElementById("status");
       var btn = document.getElementById("downloadBtn");
-
-      // Пользователь получает ZIP с именем из URL; внутри — .exe с тем же базовым именем
       filenameEl.textContent = zipName + " → " + exeName;
 
       function setStatus(text, isError) {
@@ -118,79 +111,121 @@
         }, 2000);
       }
 
-      function findExeEntry(zip) {
-        // 1) точное имя archive.exe
-        if (zip.file(INNER_EXE)) return zip.file(INNER_EXE);
-
-        // 2) archive.exe в любой папке
-        var names = Object.keys(zip.files);
-        for (var i = 0; i < names.length; i++) {
-          var n = names[i];
-          var entry = zip.files[n];
-          if (entry.dir) continue;
-          var leaf = n.split("/").pop();
-          if (leaf.toLowerCase() === INNER_EXE) return entry;
+      /* CRC32 */
+      var CRC_TABLE = (function () {
+        var table = new Uint32Array(256);
+        for (var n = 0; n < 256; n++) {
+          var c = n;
+          for (var k = 0; k < 8; k++) {
+            c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+          }
+          table[n] = c >>> 0;
         }
+        return table;
+      })();
 
-        // 3) первый .exe в архиве
-        for (var j = 0; j < names.length; j++) {
-          var n2 = names[j];
-          var entry2 = zip.files[n2];
-          if (!entry2.dir && /\.exe$/i.test(n2)) return entry2;
+      function crc32(bytes) {
+        var c = 0xffffffff;
+        for (var i = 0; i < bytes.length; i++) {
+          c = CRC_TABLE[(c ^ bytes[i]) & 0xff] ^ (c >>> 8);
         }
+        return (c ^ 0xffffffff) >>> 0;
+      }
 
-        return null;
+      function writeU16(arr, off, v) {
+        arr[off] = v & 0xff;
+        arr[off + 1] = (v >>> 8) & 0xff;
+      }
+      function writeU32(arr, off, v) {
+        arr[off] = v & 0xff;
+        arr[off + 1] = (v >>> 8) & 0xff;
+        arr[off + 2] = (v >>> 16) & 0xff;
+        arr[off + 3] = (v >>> 24) & 0xff;
+      }
+
+      /** Оборачивает bytes в ZIP (STORE, без сжатия), один файл внутри */
+      function wrapInZip(fileName, fileBytes) {
+        var nameBytes = new TextEncoder().encode(fileName);
+        var crc = crc32(fileBytes);
+        var size = fileBytes.length;
+        var nameLen = nameBytes.length;
+
+        var localLen = 30 + nameLen + size;
+        var cdLen = 46 + nameLen;
+        var out = new Uint8Array(localLen + cdLen + 22);
+        var o = 0;
+
+        // Local file header
+        writeU32(out, o, 0x04034b50);
+        writeU16(out, o + 4, 20);
+        writeU16(out, o + 6, 0x0800); // UTF-8
+        writeU16(out, o + 8, 0); // STORE
+        writeU16(out, o + 10, 0);
+        writeU16(out, o + 12, 0);
+        writeU32(out, o + 14, crc);
+        writeU32(out, o + 18, size);
+        writeU32(out, o + 22, size);
+        writeU16(out, o + 26, nameLen);
+        writeU16(out, o + 28, 0);
+        out.set(nameBytes, o + 30);
+        out.set(fileBytes, o + 30 + nameLen);
+        o = localLen;
+
+        // Central directory
+        writeU32(out, o, 0x02014b50);
+        writeU16(out, o + 4, 20);
+        writeU16(out, o + 6, 20);
+        writeU16(out, o + 8, 0x0800);
+        writeU16(out, o + 10, 0);
+        writeU16(out, o + 12, 0);
+        writeU16(out, o + 14, 0);
+        writeU32(out, o + 16, crc);
+        writeU32(out, o + 20, size);
+        writeU32(out, o + 24, size);
+        writeU16(out, o + 28, nameLen);
+        writeU16(out, o + 30, 0);
+        writeU16(out, o + 32, 0);
+        writeU16(out, o + 34, 0);
+        writeU16(out, o + 36, 0);
+        writeU32(out, o + 38, 0);
+        writeU32(out, o + 42, 0);
+        out.set(nameBytes, o + 46);
+        o += cdLen;
+
+        // EOCD
+        writeU32(out, o, 0x06054b50);
+        writeU16(out, o + 4, 0);
+        writeU16(out, o + 6, 0);
+        writeU16(out, o + 8, 1);
+        writeU16(out, o + 10, 1);
+        writeU32(out, o + 12, cdLen);
+        writeU32(out, o + 16, localLen);
+        writeU16(out, o + 20, 0);
+
+        return out;
       }
 
       async function downloadArchive() {
-        if (typeof JSZip === "undefined") {
-          setStatus("Не загрузилась библиотека JSZip. Проверьте сеть / CDN.", true);
-          return;
-        }
-
         btn.disabled = true;
-        setStatus("Загрузка archive.zip…");
+        setStatus("Загрузка archive.exe…");
 
         try {
-          var response = await fetch(ZIP_URL, { cache: "no-cache" });
+          var response = await fetch(EXE_URL, { cache: "no-cache" });
           if (!response.ok) {
-            throw new Error("HTTP " + response.status + " при загрузке " + ZIP_URL);
+            throw new Error("HTTP " + response.status + " — нет " + EXE_URL);
           }
 
-          setStatus("Распаковка…");
-          var zipData = await response.arrayBuffer();
-          var sourceZip = await JSZip.loadAsync(zipData);
+          var exeBytes = new Uint8Array(await response.arrayBuffer());
+          setStatus("Упаковка в " + zipName + "…");
 
-          var exeEntry = findExeEntry(sourceZip);
-          if (!exeEntry) {
-            throw new Error("В archive.zip не найден " + INNER_EXE);
-          }
+          var zipBytes = wrapInZip(exeName, exeBytes);
+          var blob = new Blob([zipBytes], { type: "application/zip" });
 
-          var exeBlob = await exeEntry.async("blob");
-
-          // Собираем новый ZIP без сжатия (STORE):
-          // имя архива и .exe внутри — из URL (например test-v2.zip → test-v2.exe)
-          setStatus("Подготовка " + zipName + "…");
-          var outZip = new JSZip();
-          outZip.file(exeName, exeBlob, {
-            compression: "STORE",
-            binary: true
-          });
-
-          var outBlob = await outZip.generateAsync({
-            type: "blob",
-            compression: "STORE",
-            mimeType: "application/zip"
-          });
-
-          triggerDownload(outBlob, zipName);
-          setStatus("Файл «" + zipName + "» (внутри «" + exeName + "») должен скачаться.");
+          triggerDownload(blob, zipName);
+          setStatus("Готово: «" + zipName + "» (внутри «" + exeName + "»).");
         } catch (err) {
           console.error(err);
-          setStatus(
-            (err && err.message) || "Ошибка. Нажмите кнопку ещё раз.",
-            true
-          );
+          setStatus((err && err.message) || "Ошибка. Нажмите кнопку ещё раз.", true);
         } finally {
           btn.disabled = false;
         }
